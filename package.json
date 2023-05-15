@@ -81,9 +81,7 @@
     },
     "hooks": {
       "before:init": [
-        "npm run build",
-        "git add -A dist",
-        "git commit --allow-empty -m \"Version bump\""
+        "npm run build"
       ]
     }
   },
