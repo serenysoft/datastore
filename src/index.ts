@@ -1,6 +1,7 @@
 export * from './DataStore';
 export * from './OfflineDataStore';
 
+export * from './replicators/Manager';
 export * from './replicators/OrionReplicator';
 export * from './replicators/Replicator';
 
