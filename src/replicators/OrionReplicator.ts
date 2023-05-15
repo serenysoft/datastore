@@ -40,7 +40,7 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
   }
 
   get minUpdatedAtParam() {
-    return this.options.minUpdatedAtParam || 'min_updated_at';
+    return this.options.minUpdatedAtParam || 'minUpdatedAt';
   }
 
   collection(): RxCollection {
@@ -113,8 +113,8 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
     const transporter = this.options.transporter;
 
     const request: Request = {
-      wrap: this.options.wrap,
       path: this.options.baseUrl,
+      wrap: this.options.wrap,
     };
 
     const docs = documents.map((doc) => ({
