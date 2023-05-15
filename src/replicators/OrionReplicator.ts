@@ -27,20 +27,24 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
 
   constructor(private options: OrionReplicatorOptions<T>) {}
 
-  get updatedAtField() {
+  get updatedAtField(): string {
     return this.options.updatedAtField || 'updated_at';
   }
 
-  get deletedAtField() {
+  get deletedAtField(): string {
     return this.options.deletedField || '_deleted';
   }
 
-  get primaryKeyField() {
+  get primaryKeyField(): string {
     return this.options.collection.schema.primaryPath;
   }
 
-  get minUpdatedAtParam() {
+  get minUpdatedAtParam(): string {
     return this.options.minUpdatedAtParam || 'minUpdatedAt';
+  }
+
+  get wrap(): string {
+    return this.options.wrap || 'data';
   }
 
   collection(): RxCollection {
@@ -84,7 +88,7 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
 
       data = await transporter.execute({
         path: this.options.baseUrl,
-        wrap: this.options.wrap,
+        wrap: this.wrap,
         ...route,
       });
 
@@ -114,7 +118,7 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
 
     const request: Request = {
       path: this.options.baseUrl,
-      wrap: this.options.wrap,
+      wrap: this.wrap,
     };
 
     const docs = documents.map((doc) => ({
