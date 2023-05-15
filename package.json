@@ -76,9 +76,6 @@
     "git": {
       "commitMessage": "Release v${version}"
     },
-    "npm": {
-      "publish": false
-    },
     "hooks": {
       "before:init": [
         "npm run build"
