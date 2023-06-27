@@ -4,7 +4,7 @@ export interface ReplicatorOptions<O = any> {
   collection: RxCollection<O>;
 }
 
-export interface IReplicator<T = any, R = any> {
+export interface Replicator<T = any, R = any> {
   pull(lastCheckpoint: any, batchSize: number): Promise<R>;
 
   push(data: RxReplicationWriteToMasterRow<T>[]): Promise<R[]>;

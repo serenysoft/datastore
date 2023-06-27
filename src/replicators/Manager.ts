@@ -1,15 +1,15 @@
 import { RxCollection } from 'rxdb';
-import { IReplicator } from './Replicator';
+import { Replicator } from './Replicator';
 
 export class Manager {
-  private instances = new Map<RxCollection, IReplicator>();
+  private instances = new Map<RxCollection, Replicator>();
 
-  add(instance: IReplicator): this {
+  add(instance: Replicator): this {
     this.instances.set(instance.collection(), instance);
     return this;
   }
 
-  get(collection: RxCollection): IReplicator {
+  get(collection: RxCollection): Replicator {
     return this.instances.get(collection);
   }
 

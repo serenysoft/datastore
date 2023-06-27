@@ -3,11 +3,14 @@ export type RequestParams = {
   [key: string]: string | number | object | boolean;
 };
 
-export interface Request {
+export interface Route {
   path?: string;
   method?: string;
   params?: RequestParams;
   headers?: RequestHeaders;
+}
+
+export interface Request extends Route {
   data?: any;
   key?: string | number;
   wrap?: string;

@@ -4,12 +4,12 @@ import {
   RxReplicationState,
 } from 'rxdb/plugins/replication';
 import { last } from 'lodash';
-import { IReplicator, ReplicatorOptions } from './Replicator';
+import { Replicator, ReplicatorOptions } from './Replicator';
 import { OrionFindTransformer } from '../transformers/OrionFindTransformer';
-import { Request, Transporter } from '../transporters/Transporter';
+import { Request, Route, Transporter } from '../transporters/Transporter';
 
 export interface OrionReplicatorOptions<T = any> extends ReplicatorOptions<T> {
-  baseUrl: string;
+  baseUrl: string | Route;
   transporter: Transporter;
   autoStart?: boolean;
   batchSize?: number;
@@ -22,7 +22,7 @@ export interface OrionReplicatorOptions<T = any> extends ReplicatorOptions<T> {
   wrap?: string;
 }
 
-export class OrionReplicator<T = any> implements IReplicator<T, any> {
+export class OrionReplicator<T = any> implements Replicator<T, any> {
   private replication: RxReplicationState<T, any>;
 
   constructor(private options: OrionReplicatorOptions<T>) {}
@@ -51,6 +51,12 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
     return this.options.collection;
   }
 
+  baseRoute(): Route {
+    return typeof this.options.baseUrl === 'string'
+      ? { path: this.options.baseUrl }
+      : this.options.baseUrl;
+  }
+
   async start(awaitInit: boolean = true): Promise<void> {
     if (!this.replication || this.replication.isStopped()) {
       this.replication = this.createReplication();
@@ -77,6 +83,7 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
     let data;
     let page = 0;
     const result = [];
+
     do {
       const scopes = updatedAt ? { [this.minUpdatedAtParam]: updatedAt } : null;
 
@@ -87,8 +94,8 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
       });
 
       data = await transporter.execute({
-        path: this.options.baseUrl,
         wrap: this.wrap,
+        ...this.baseRoute(),
         ...route,
       });
 
@@ -115,11 +122,7 @@ export class OrionReplicator<T = any> implements IReplicator<T, any> {
   async push(documents: RxReplicationWriteToMasterRow<any>[]): Promise<any[]> {
     const { primaryKeyField, deletedAtField } = this;
     const transporter = this.options.transporter;
-
-    const request: Request = {
-      path: this.options.baseUrl,
-      wrap: this.wrap,
-    };
+    const request = this.baseRoute() as Request;
 
     const docs = documents.map((doc) => ({
       ...doc.newDocumentState,
