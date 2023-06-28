@@ -3,7 +3,7 @@ import {
   replicateRxCollection,
   RxReplicationState,
 } from 'rxdb/plugins/replication';
-import { last } from 'lodash';
+import { last, merge } from 'lodash';
 import { Replicator, ReplicatorOptions } from './Replicator';
 import { OrionFindTransformer } from '../transformers/OrionFindTransformer';
 import { Request, Route, Transporter } from '../transporters/Transporter';
@@ -93,11 +93,9 @@ export class OrionReplicator<T = any> implements Replicator<T, any> {
         limit: batchSize,
       });
 
-      data = await transporter.execute({
-        wrap: this.wrap,
-        ...this.baseRoute(),
-        ...route,
-      });
+      data = await transporter.execute(
+        merge({ wrap: this.wrap }, this.baseRoute(), route)
+      );
 
       result.push(...data);
       page++;
