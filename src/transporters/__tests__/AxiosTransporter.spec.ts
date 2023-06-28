@@ -67,7 +67,7 @@ describe('Axios Provider', () => {
         name: 'jeff',
       },
       method: 'POST',
-      url: '/users',
+      url: 'users',
       headers: undefined,
       params: undefined,
     });

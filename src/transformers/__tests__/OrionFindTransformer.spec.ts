@@ -1,6 +1,6 @@
 import { OrionFindTransformer } from '../OrionFindTransformer';
 
-describe('Orion- FindTransformer', () => {
+describe('Orion - FindTransformer', () => {
   it('Should serialize find options to url query params', async () => {
     const trasformer = new OrionFindTransformer();
 

@@ -1,19 +1,16 @@
 import { AxiosInstance } from 'axios';
-import { isNil, isPlainObject, omitBy } from 'lodash';
+import { compact, isNil, omitBy } from 'lodash';
 import { Request, Transporter } from './Transporter';
 
 export class AxiosTransporter<T = any> implements Transporter {
   constructor(private http: AxiosInstance) {}
 
   async execute(request: Request): Promise<T> {
-    const url = [request.path, request.key, request.suffix]
-      .filter((element) => !isNil(element))
-      .map((element) => element.toString().replace(/^\/|\/$/, ''))
+    const url = compact([request.path, request.key, request.suffix])
+      .map((element) => String(element).replace(/^\/|\/$/, ''))
       .join('/');
 
-    const data = isPlainObject(request)
-      ? request.data
-      : omitBy(request.data, isNil);
+    const data = omitBy(request.data, isNil);
 
     try {
       const response = await this.http.request({
@@ -21,7 +18,7 @@ export class AxiosTransporter<T = any> implements Transporter {
         method: request.method,
         headers: request.headers,
         params: request.params,
-        data: data,
+        data,
       });
 
       return request.wrap ? response.data[request.wrap] : response.data;

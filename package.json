@@ -29,8 +29,7 @@
     "build": "rimraf -rf dist/ && tsc --project tsconfig.dist.json",
     "lint": "eslint \"src/**/*\" \"tests/**/*\"",
     "release": "release-it --only-version",
-    "test": "cross-env NODE_ENV=testing jest --verbose --runInBand --detectOpenHandles -i replicators",
-    "test:serve": "node tests/server.js",
+    "test": "cross-env NODE_ENV=testing jest --verbose --runInBand --detectOpenHandles",
     "test:ci": "cross-env NODE_ENV=testing jest --verbose --collect-coverage --runInBand"
   },
   "engines": {
