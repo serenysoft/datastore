@@ -1,4 +1,4 @@
-import { AxiosTransporter } from '../AxiosTransporter';
+import { AxiosTransporter } from '../../src/transporters/AxiosTransporter';
 import axios from 'axios';
 import './AxiosTransporter.mock';
 

@@ -1,4 +1,4 @@
-import { OrionFindTransformer } from '../OrionFindTransformer';
+import { OrionFindTransformer } from '../../src/transformers/OrionFindTransformer';
 
 describe('Orion - FindTransformer', () => {
   it('Should serialize find options to url query params', async () => {

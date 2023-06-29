@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
 import { RxDatabase } from 'rxdb';
-import { AxiosTransporter } from '../../transporters/AxiosTransporter';
-import { OrionReplicator } from '../OrionReplicator';
-import { initDatabase } from '../../../tests/database';
+import { AxiosTransporter } from '../../src/transporters/AxiosTransporter';
+import { OrionReplicator } from '../../src/replicators/OrionReplicator';
+import { initDatabase } from '../database';
 
 describe('Offline - DataStore', () => {
   let http: AxiosInstance;

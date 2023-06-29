@@ -1,4 +1,4 @@
-import { OfflineFindTransformer } from '../OfflineFindTransformer';
+import { OfflineFindTransformer } from '../../src/transformers/OfflineFindTransformer';
 
 describe('Offline - FindTransformer', () => {
   it('Should transform find options finding by nullish values', async () => {
