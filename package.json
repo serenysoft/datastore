@@ -11,10 +11,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/serenysoft/framework/packages/datastore"
+    "url": "https://github.com/serenysoft/datastore"
   },
   "bugs": {
-    "url": "https://github.com/serenysoft/framework/issues"
+    "url": "https://github.com/serenysoft/datastore/issues"
   },
   "author": {
     "name": "Leandro Guindani Gehlen",
