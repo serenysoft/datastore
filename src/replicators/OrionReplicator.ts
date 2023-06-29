@@ -3,7 +3,7 @@ import {
   replicateRxCollection,
   RxReplicationState,
 } from 'rxdb/plugins/replication';
-import { last, merge } from 'lodash';
+import { last, merge, omit } from 'lodash';
 import { Replicator, ReplicatorOptions } from './Replicator';
 import { OrionFindTransformer } from '../transformers/OrionFindTransformer';
 import { Request, Route, Transporter } from '../transporters/Transporter';
@@ -47,14 +47,14 @@ export class OrionReplicator<T = any> implements Replicator<T, any> {
     return this.options.wrap || 'data';
   }
 
-  collection(): RxCollection {
-    return this.options.collection;
-  }
-
-  baseRoute(): Route {
+  get baseRoute(): Route {
     return typeof this.options.baseUrl === 'string'
       ? { path: this.options.baseUrl }
       : this.options.baseUrl;
+  }
+
+  collection(): RxCollection {
+    return this.options.collection;
   }
 
   async start(awaitInit: boolean = true): Promise<void> {
@@ -94,7 +94,7 @@ export class OrionReplicator<T = any> implements Replicator<T, any> {
       });
 
       data = await transporter.execute(
-        merge({ wrap: this.wrap }, this.baseRoute(), route)
+        merge({ wrap: this.wrap }, this.baseRoute, route)
       );
 
       result.push(...data);
@@ -120,7 +120,7 @@ export class OrionReplicator<T = any> implements Replicator<T, any> {
   async push(documents: RxReplicationWriteToMasterRow<any>[]): Promise<any[]> {
     const { primaryKeyField, deletedAtField } = this;
     const transporter = this.options.transporter;
-    const request = this.baseRoute() as Request;
+    const request = omit<Request>(this.baseRoute, ['params']);
 
     const docs = documents.map((doc) => ({
       ...doc.newDocumentState,
@@ -147,11 +147,9 @@ export class OrionReplicator<T = any> implements Replicator<T, any> {
   }
 
   createReplication() {
-    const identifier = `${this.options.collection.name}-${this.options.baseUrl}`;
-
     return replicateRxCollection<T, any>({
       collection: this.options.collection,
-      replicationIdentifier: identifier,
+      replicationIdentifier: this.options.collection.name,
       waitForLeadership: this.options.waitForLeadership || false,
       autoStart: this.options.autoStart,
       retryTime: this.options.retryTime,
