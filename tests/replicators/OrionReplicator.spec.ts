@@ -24,7 +24,7 @@ describe('Offline - DataStore', () => {
 
   it('should include query params to base URL', async () => {
     jest
-      .spyOn(AxiosTransporter.prototype, 'execute')
+      .spyOn(transporter, 'execute')
       .mockImplementation(() => Promise.resolve([]));
 
     const replicator = new OrionReplicator({
