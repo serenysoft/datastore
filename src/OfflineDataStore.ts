@@ -69,7 +69,8 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     const result: any = document.toMutableJSON();
 
     for (const key in this.collectionReferences()) {
-      const references = await document.populate(key);
+      const references = (await document.populate(key)) || [];
+
       result[key] = references.map((item: RxDocument<T>) =>
         item.toMutableJSON()
       );
@@ -85,7 +86,10 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     for (const [key, value] of references) {
       const schema = this.options.collection.database.collections[value].schema;
       const primaryPath = schema.primaryPath as string;
-      result[key] = data[key].map((reference: any) => reference[primaryPath]);
+
+      result[key] = (data[key] || []).map(
+        (reference: any) => reference[primaryPath]
+      );
     }
 
     return result;
