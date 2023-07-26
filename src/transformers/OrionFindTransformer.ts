@@ -43,13 +43,11 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
       parameters: Array.isArray(value) ? value : [value],
     }));
 
-    const filtersResult = Object.entries(omit(filters, '_trashed')).map(
-      ([key, value]) => ({
-        field: key,
-        operator: Array.isArray(value) ? 'in' : '=',
-        value: value,
-      })
-    );
+    const filtersResult = Object.entries(omit(filters, '_trashed')).map(([key, value]) => ({
+      field: key,
+      operator: Array.isArray(value) ? 'in' : '=',
+      value: value,
+    }));
 
     const body = {
       search: data.searchValue ? { value: data.searchValue } : null,

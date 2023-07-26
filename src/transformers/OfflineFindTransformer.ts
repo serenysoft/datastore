@@ -16,9 +16,7 @@ export class OfflineFindTransformer implements Transformer<FindOptions> {
     if (data.searchValue && this.search?.fields.length) {
       const condition = this.buildSearchCondition(data.searchValue);
 
-      selector = !isEmpty(selector)
-        ? { $and: [condition, selector] }
-        : condition;
+      selector = !isEmpty(selector) ? { $and: [condition, selector] } : condition;
     }
 
     const result: any = {
@@ -28,9 +26,7 @@ export class OfflineFindTransformer implements Transformer<FindOptions> {
     };
 
     if (sort.length) {
-      result.sort = sort.map(
-        (order) => ({ [order.selector]: order.desc ? 'desc' : 'asc' } as any)
-      );
+      result.sort = sort.map((order) => ({ [order.selector]: order.desc ? 'desc' : 'asc' } as any));
     } else if (this.search?.sort) {
       result.sort = [];
       for (const [key, value] of Object.entries(this.search.sort)) {

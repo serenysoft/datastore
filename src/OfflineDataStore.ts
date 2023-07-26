@@ -16,7 +16,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
 
   async findOne(key: string): Promise<T> {
     const document = await this.options.collection.findOne(key).exec();
-    return document?.deleted ? null : this.populate(document);
+    return document?.deleted ? null : this.populate(document, true);
   }
 
   async findAll(options?: FindOptions): Promise<T[]> {
@@ -65,15 +65,24 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     throw new Error('Method not implemented.');
   }
 
-  private async populate(document: RxDocument<T>): Promise<T> {
+  private async populate(document: RxDocument<T>, onlyArray: boolean = false): Promise<T> {
     const result: any = document.toMutableJSON();
 
-    for (const key in this.collectionReferences()) {
-      const references = (await document.populate(key)) || [];
+    for (const [key, value] of Object.entries(this.collectionReferences())) {
+      const reference = await document.populate(key);
+      const isArray = value.type === 'array';
 
-      result[key] = references.map((item: RxDocument<T>) =>
-        item.toMutableJSON()
-      );
+      if (!reference) {
+        if (isArray) {
+          result[key] = [];
+        }
+      } else {
+        if (isArray) {
+          result[key] = reference.map((item: RxDocument<T>) => item.toMutableJSON());
+        } else if (!onlyArray) {
+          result[key] = reference.toMutableJSON();
+        }
+      }
     }
 
     return result;
@@ -84,26 +93,24 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     const result = { ...data };
 
     for (const [key, value] of references) {
-      const schema = this.options.collection.database.collections[value].schema;
-      const primaryPath = schema.primaryPath as string;
+      const collection = this.options.collection.database.collections[value.ref];
+      const primaryPath = collection.schema.primaryPath as string;
 
-      result[key] = (data[key] || []).map(
-        (reference: any) => reference[primaryPath]
-      );
+      if (value.type === 'array') {
+        result[key] = (data[key] || []).map((reference: any) => reference[primaryPath]);
+      }
     }
 
     return result;
   }
 
-  private collectionReferences(): Record<string, string> {
-    const result: Record<string, string> = {};
-    const entries = Object.entries(
-      this.options.collection.schema.jsonSchema.properties
-    );
+  private collectionReferences(): Record<string, any> {
+    const result: Record<string, object> = {};
+    const entries = Object.entries(this.options.collection.schema.jsonSchema.properties);
 
     for (const [key, value] of entries) {
-      if (value.type === 'array' && value.ref) {
-        result[key] = value.ref;
+      if (value.ref) {
+        result[key] = { ref: value.ref, type: value.type };
       }
     }
 

@@ -111,7 +111,8 @@
           "endOfLine": "auto",
           "singleQuote": true,
           "quoteProps": "preserve",
-          "bracketSameLine": false
+          "bracketSameLine": false,
+          "printWidth": 100
         }
       ],
       "@typescript-eslint/explicit-module-boundary-types": "off",
