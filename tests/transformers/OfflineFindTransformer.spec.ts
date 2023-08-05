@@ -1,7 +1,7 @@
 import { OfflineFindTransformer } from '../../src/transformers/OfflineFindTransformer';
 
 describe('Offline - FindTransformer', () => {
-  it('Should transform find options finding by nullish values', async () => {
+  it('Should transform find options by nullish values', async () => {
     const trasformer = new OfflineFindTransformer({
       fields: ['name', { age: 'number' }],
     });
@@ -16,7 +16,7 @@ describe('Offline - FindTransformer', () => {
     expect(result).toEqual({});
   });
 
-  it('Should transform find options finding by options', async () => {
+  it('Should transform find options', async () => {
     const trasformer = new OfflineFindTransformer({
       fields: ['name', { age: 'number' }],
       sort: {
@@ -29,6 +29,7 @@ describe('Offline - FindTransformer', () => {
       limit: 5,
       skip: 10,
       searchValue: 10,
+      group: [{ selector: 'category' }],
       sort: [
         { selector: 'age', desc: true },
         { selector: 'name', desc: false },
@@ -46,11 +47,11 @@ describe('Offline - FindTransformer', () => {
       selector: {
         $and: [{ $or: [{ name: regex }, { age: 10 }] }, { active: true }],
       },
-      sort: [{ age: 'desc' }, { name: 'asc' }],
+      sort: [{ category: 'asc' }, { age: 'desc' }, { name: 'asc' }],
     });
   });
 
-  it('Should transform default sort only when sort find options was not defined', async () => {
+  it('Should transform default sort only when sort options was not defined', async () => {
     const trasformer = new OfflineFindTransformer({
       fields: ['name', { age: 'number' }],
       sort: {

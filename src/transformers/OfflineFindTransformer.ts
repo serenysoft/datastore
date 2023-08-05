@@ -13,6 +13,14 @@ export class OfflineFindTransformer implements Transformer<FindOptions> {
     let selector = data.filter;
     const sort = data.sort || [];
 
+    if (data.group?.length) {
+      const groups = data.group?.map((group) => ({
+        selector: group.selector,
+        desc: false,
+      }));
+      sort.unshift(...groups);
+    }
+
     if (data.searchValue && this.search?.fields.length) {
       const condition = this.buildSearchCondition(data.searchValue);
 
