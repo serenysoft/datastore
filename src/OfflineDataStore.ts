@@ -80,7 +80,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
         if (isArray) {
           result[key] = reference.map((item: RxDocument<T>) => item.toMutableJSON());
         } else if (!onlyArray) {
-          result[key] = reference.toMutableJSON();
+          result[key.replace('_id', '')] = reference.toMutableJSON();
         }
       }
     }
