@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { DataStore, DataStoreOptions, FindOptions } from './DataStore';
+import { DataStore, DataStoreOptions, FindOptions, LinkParams } from './DataStore';
 import { RxCollection, RxDocument } from 'rxdb';
 import { OfflineFindTransformer } from './transformers/OfflineFindTransformer';
 
@@ -8,6 +8,8 @@ export interface OfflineDataStoreOptions<T = any> extends DataStoreOptions {
 }
 
 export class OfflineDataStore<T = any> implements DataStore<T> {
+  private linkParams: LinkParams;
+
   constructor(private options: OfflineDataStoreOptions<T>) {}
 
   key(): string {
@@ -41,10 +43,13 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
       const document = await collection.findOne(value).exec();
       result = await document.incrementalPatch(data);
     } else {
-      result = await collection.insert({
+      const doc = {
         [key]: uuidv4(),
         ...data,
-      });
+        ...this.linkParams,
+      };
+
+      result = await collection.insert(doc);
     }
 
     return result.toMutableJSON();
@@ -60,9 +65,8 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     throw new Error('Method not implemented.');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  link(data: Record<string, string | number>): void {
-    throw new Error('Method not implemented.');
+  link(params: LinkParams): void {
+    this.linkParams = params;
   }
 
   private async populate(document: RxDocument<T>, onlyArray: boolean = false): Promise<T> {

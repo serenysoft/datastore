@@ -1,5 +1,5 @@
 import { isEmpty, isNil, isPlainObject, merge, omitBy } from 'lodash';
-import { DataStore, DataStoreOptions } from './DataStore';
+import { DataStore, DataStoreOptions, LinkParams } from './DataStore';
 import { FindOptions } from './DataStore';
 import { Transformer } from './transformers/Transformer';
 import { serializeDates } from './utils';
@@ -39,7 +39,7 @@ export interface RestDataStoreOptions extends DataStoreOptions {
 }
 
 export abstract class RestDataStore<T = any> implements DataStore<T> {
-  private linkData: Record<string, string | number>;
+  private linkParams: LinkParams;
   private readonly macro = /\{\w+\}/;
 
   public constructor(protected options: RestDataStoreOptions) {}
@@ -48,8 +48,8 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return this.options.key;
   }
 
-  public link(data: Record<string, string | number>): void {
-    this.linkData = data;
+  public link(params: LinkParams): void {
+    this.linkParams = params;
   }
 
   public async findOne(key: string): Promise<T> {
@@ -167,7 +167,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
       baseUrl: this.options.baseUrl,
       ...route,
       params: omitBy(route.params, isNil),
-      link: this.linkData,
+      link: this.linkParams,
     };
 
     if (isEmpty(request.params)) {
@@ -192,7 +192,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
       routes?.show?.path,
     ].filter((url) => typeof url === 'string');
 
-    return isEmpty(this.linkData) && urls.some((url) => this.macro.test(url));
+    return isEmpty(this.linkParams) && urls.some((url) => this.macro.test(url));
   }
 
   protected abstract createTransformer(): Transformer<FindOptions>;

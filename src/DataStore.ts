@@ -1,3 +1,4 @@
+export type LinkParams = Record<string, string | number>;
 export type SearchSort = { [param: string]: 'asc' | 'desc' };
 export type SearchFieldType = 'number' | 'string' | 'datetime';
 export type SearchField = string | { [name: string]: SearchFieldType };
@@ -43,5 +44,5 @@ export interface DataStore<T = any> {
 
   upload(data: FormData): Promise<any>;
 
-  link(data: Record<string, number | string>): void;
+  link(params: LinkParams): void;
 }
