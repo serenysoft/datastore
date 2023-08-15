@@ -96,6 +96,13 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return result;
   }
 
+  async exists(condition: any): Promise<boolean> {
+    const result = await this.findAll({
+      filter: { filters: condition },
+    });
+    return !!result.length;
+  }
+
   public async save(data: T): Promise<any> {
     const key = (data as any)[this.options.key];
 

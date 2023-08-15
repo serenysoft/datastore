@@ -38,6 +38,8 @@ export interface DataStore<T = any> {
 
   findAll(options?: FindOptions): Promise<T[]>;
 
+  exists(options: any): Promise<boolean>;
+
   save(data: T): Promise<any>;
 
   remove(key: string): Promise<void>;

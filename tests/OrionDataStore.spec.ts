@@ -345,6 +345,29 @@ describe('Orion DataStore', () => {
     });
   });
 
+  it('POST /search - exists', async () => {
+    executeMock.mockReturnValue([]);
+
+    const dataStore = new OrionDataStore({
+      key: 'id',
+      baseUrl: 'http://localhost/contacts',
+      transporter: transporter,
+    });
+
+    await dataStore.exists({ name: 'Bill' });
+
+    expect(transporter.execute).toHaveBeenCalledWith({
+      data: {
+        filters: [{ field: 'name', operator: '=', value: 'Bill' }],
+        scopes: [],
+      },
+      method: 'POST',
+      baseUrl: 'http://localhost/contacts',
+      suffix: '/search',
+      wrap: 'data',
+    });
+  });
+
   /*
   it('POST /upload', async () => {
     const dataStore = new OrionDataStore({

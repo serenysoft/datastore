@@ -31,6 +31,11 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     return Promise.all(results.map((result) => this.populate(result)));
   }
 
+  async exists(condition: any): Promise<boolean> {
+    const document = await this.options.collection.findOne({ selector: condition }).exec();
+    return document !== null;
+  }
+
   async save(data: T): Promise<any> {
     let result;
     const key = this.key();

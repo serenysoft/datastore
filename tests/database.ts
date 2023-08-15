@@ -1,10 +1,10 @@
 import { createRxDatabase } from 'rxdb';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
+import { indexedDB, IDBKeyRange } from 'fake-indexeddb';
 
-const contactSchema = {
-  title: 'Contact schema',
+export const userSchema = {
   version: 0,
-  description: 'Describes a contact',
+  description: 'The user schema',
   primaryKey: 'id',
   type: 'object',
   properties: {
@@ -15,21 +15,21 @@ const contactSchema = {
     name: {
       type: 'string',
     },
-    companyName: {
-      type: 'string',
-    },
   },
 };
 
 export async function initDatabase() {
   const database = await createRxDatabase({
     name: 'testdb',
-    storage: getRxStorageDexie(),
+    storage: getRxStorageDexie({
+      indexedDB: indexedDB,
+      IDBKeyRange: IDBKeyRange,
+    }),
   });
 
   await database.addCollections({
-    contacts: {
-      schema: contactSchema,
+    users: {
+      schema: userSchema,
     },
   });
 
