@@ -363,7 +363,7 @@ describe('Orion DataStore', () => {
       },
       method: 'POST',
       baseUrl: 'http://localhost/contacts',
-      suffix: '/search',
+      action: '/search',
       wrap: 'data',
     });
   });

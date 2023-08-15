@@ -14,7 +14,7 @@ export interface Request extends Route {
   data?: any;
   key?: string | number;
   wrap?: string;
-  suffix?: string;
+  action?: string;
   link?: Record<string, string | number | boolean>;
 }
 

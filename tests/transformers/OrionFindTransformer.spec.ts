@@ -33,7 +33,7 @@ describe('Orion - FindTransformer', () => {
     });
 
     expect(result.method).toEqual('POST');
-    expect(result.suffix).toEqual('/search');
+    expect(result.action).toEqual('/search');
     expect(result.params).toEqual({ limit: 5, page: 3, with_trashed: true });
     expect(result.data).toEqual({
       filters: [

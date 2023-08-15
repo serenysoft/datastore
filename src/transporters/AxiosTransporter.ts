@@ -6,7 +6,7 @@ export class AxiosTransporter<T = any> implements Transporter {
   constructor(private http: AxiosInstance) {}
 
   async execute(request: Request): Promise<T> {
-    const url = compact([request.path, request.key, request.suffix])
+    const url = compact([request.path, request.key, request.action])
       .map((element) => String(element).replace(/^\/|\/$/, ''))
       .join('/');
 

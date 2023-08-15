@@ -61,7 +61,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
       method: 'POST',
       params: omitBy(params, isNil),
       data: omitBy(body, isNil),
-      suffix: '/search',
+      action: '/search',
     };
   }
 }
