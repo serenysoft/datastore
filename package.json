@@ -2,7 +2,7 @@
   "name": "@sereny/datastore",
   "description": "The DataStore provides an interface for loading, editing and handling related events.",
   "readmeFilename": "README.md",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "license": "MIT",
   "keywords": [
     "datasource",
