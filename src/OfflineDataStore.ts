@@ -18,7 +18,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
 
   async findOne(key: string): Promise<T> {
     const document = await this.options.collection.findOne(key).exec();
-    return document?.deleted ? null : this.populate(document, true);
+    return document && !document.deleted ? this.populate(document, true) : null;
   }
 
   async findAll(options?: FindOptions): Promise<T[]> {
