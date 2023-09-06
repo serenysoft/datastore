@@ -14,12 +14,12 @@ export class OrionDataStore<T = any> extends RestDataStore<T> {
     this.options = opts;
   }
 
-  public async save(data: T): Promise<any> {
+  public async insert(data: T): Promise<any> {
     if (this.options.attachable) {
       return this.attach(data);
     }
 
-    return super.save(data);
+    return super.insert(data);
   }
 
   public async remove(key: string, force?: boolean): Promise<void> {

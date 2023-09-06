@@ -1,5 +1,5 @@
 import { isEmpty, isNil, isPlainObject, merge, omitBy } from 'lodash';
-import { DataStore, DataStoreOptions, LinkParams } from './DataStore';
+import { DataStore, DataStoreOptions, LinkParams, MediaParams } from './DataStore';
 import { FindOptions } from './DataStore';
 import { Transformer } from './transformers/Transformer';
 import { serializeDates } from './utils';
@@ -42,17 +42,17 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
   private linkParams: LinkParams;
   private readonly macro = /\{\w+\}/;
 
-  public constructor(protected options: RestDataStoreOptions) {}
+  constructor(protected options: RestDataStoreOptions) {}
 
-  public key(): string {
+  key(): string {
     return this.options.key;
   }
 
-  public link(params: LinkParams): void {
+  link(params: LinkParams): void {
     this.linkParams = params;
   }
 
-  public async findOne(key: string): Promise<T> {
+  async findOne(key: string): Promise<T> {
     if (this.hasInvalidLink()) {
       throw new Error('The link data must be set');
     }
@@ -75,7 +75,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return result;
   }
 
-  public async findAll(options?: FindOptions): Promise<T[]> {
+  async findAll(options?: FindOptions): Promise<T[]> {
     if (this.hasInvalidLink()) {
       return [];
     }
@@ -103,19 +103,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return !!result.length;
   }
 
-  public async save(data: T): Promise<any> {
-    const key = (data as any)[this.options.key];
-
-    if (key) {
-      return await this.execute({
-        method: 'PUT',
-        key: key,
-        data: data,
-        wrap: this.options.wrap,
-        ...this.options.routes?.update,
-      });
-    }
-
+  async insert(data: T): Promise<any> {
     const result = await this.execute({
       method: 'POST',
       data: data,
@@ -126,7 +114,19 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return result;
   }
 
-  public async remove(key: string, force?: boolean): Promise<void> {
+  async update(data: T): Promise<any> {
+    const key = (data as any)[this.options.key];
+
+    return await this.execute({
+      key,
+      method: 'PUT',
+      data: data,
+      wrap: this.options.wrap,
+      ...this.options.routes?.update,
+    });
+  }
+
+  async remove(key: string, force?: boolean): Promise<void> {
     await this.execute({
       method: 'DELETE',
       key: key,
@@ -135,7 +135,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     });
   }
 
-  public async restore(key: string): Promise<void> {
+  async restore(key: string): Promise<void> {
     await this.execute({
       method: 'POST',
       path: 'restore',
@@ -144,7 +144,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     });
   }
 
-  public async validate(data: T): Promise<any> {
+  async validate(data: T): Promise<any> {
     const result = await this.execute({
       method: 'POST',
       path: 'validate',
@@ -155,18 +155,34 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return result;
   }
 
-  public async upload(data: FormData): Promise<any> {
+  async putMedia(key: string, data: Blob, params: MediaParams): Promise<any> {
     const result = await this.execute({
+      key,
       method: 'POST',
-      path: 'upload',
+      path: 'media',
+      data: { ...data, ...params },
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-      data,
       ...this.options.routes?.upload,
     });
 
     return result;
+  }
+
+  async removeMedia(key: string, name: string): Promise<void> {
+    await this.execute({
+      key,
+      method: 'DELETE',
+      path: 'media',
+      action: name,
+      ...this.options.routes?.upload,
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  allMedia(key: string): Promise<any[]> {
+    throw new Error('Method not implemented.');
   }
 
   public async execute(route: Request) {

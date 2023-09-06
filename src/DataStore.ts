@@ -2,6 +2,7 @@ export type LinkParams = Record<string, string | number>;
 export type SearchSort = { [param: string]: 'asc' | 'desc' };
 export type SearchFieldType = 'number' | 'string' | 'datetime';
 export type SearchField = string | { [name: string]: SearchFieldType };
+export type MediaParams = LinkParams & { name: string; type: string };
 
 export interface Search {
   fields: SearchField[];
@@ -40,11 +41,17 @@ export interface DataStore<T = any> {
 
   exists(options: any): Promise<boolean>;
 
-  save(data: T): Promise<any>;
+  insert(data: T): Promise<any>;
+
+  update(data: T): Promise<any>;
 
   remove(key: string): Promise<void>;
 
-  upload(data: FormData): Promise<any>;
-
   link(params: LinkParams): void;
+
+  putMedia(key: string, data: Blob, params: MediaParams): Promise<any>;
+
+  removeMedia(key: string, name: string): Promise<void>;
+
+  allMedia(key: string): Promise<any[]>;
 }

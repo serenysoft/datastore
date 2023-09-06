@@ -1,6 +1,9 @@
-import { createRxDatabase } from 'rxdb';
+import { addRxPlugin, createRxDatabase } from 'rxdb';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
+import { RxDBAttachmentsPlugin } from 'rxdb/plugins/attachments';
 import { indexedDB, IDBKeyRange } from 'fake-indexeddb';
+
+addRxPlugin(RxDBAttachmentsPlugin);
 
 export const userSchema = {
   version: 0,
@@ -15,6 +18,9 @@ export const userSchema = {
     name: {
       type: 'string',
     },
+  },
+  attachments: {
+    encrypted: false,
   },
 };
 

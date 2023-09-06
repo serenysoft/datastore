@@ -133,7 +133,7 @@ describe('Orion DataStore', () => {
     });
 
     const data = { name: 'Bill' };
-    await dataStore.save(data);
+    await dataStore.insert(data);
 
     expect(transporter.execute).toHaveBeenCalledWith({
       data: data,
@@ -157,7 +157,7 @@ describe('Orion DataStore', () => {
     });
 
     const data = { name: 'Bill' };
-    await dataStore.save(data);
+    await dataStore.insert(data);
 
     expect(transporter.execute).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
@@ -176,7 +176,7 @@ describe('Orion DataStore', () => {
     });
 
     const data = { id: '2', name: 'Bill' };
-    await dataStore.save(data);
+    await dataStore.update(data);
 
     expect(transporter.execute).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
@@ -201,7 +201,7 @@ describe('Orion DataStore', () => {
     });
 
     const data = { id: '3', name: 'Bill' };
-    await dataStore.save(data);
+    await dataStore.update(data);
 
     expect(transporter.execute).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',

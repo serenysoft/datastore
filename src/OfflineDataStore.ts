@@ -1,4 +1,4 @@
-import { DataStore, DataStoreOptions, FindOptions, LinkParams } from './DataStore';
+import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 import { RxCollection, RxDocument } from 'rxdb';
 import { OfflineFindTransformer } from './transformers/OfflineFindTransformer';
 
@@ -35,41 +35,64 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     return document !== null;
   }
 
-  async save(data: T): Promise<any> {
-    let result;
-    const key = this.key();
-    const value = (data as any)[key];
-    const collection = this.options.collection;
+  async insert(data: T): Promise<any> {
+    const doc = {
+      ...data,
+      ...this.linkParams,
+    };
 
-    data = this.normalize(data);
+    const result = await this.options.collection.insert(doc);
+    return result.toMutableJSON();
+  }
 
-    if (value) {
-      const document = await collection.findOne(value).exec();
-      result = await document.incrementalPatch(data);
-    } else {
-      const doc = {
-        ...data,
-        ...this.linkParams,
-      };
-
-      result = await collection.insert(doc);
-    }
+  async update(data: T): Promise<any> {
+    const key = (data as any)[this.key()];
+    const document = await this.findOneOrFail(key);
+    const result = await document.incrementalPatch(this.normalize(data));
 
     return result.toMutableJSON();
   }
 
   async remove(key: string): Promise<void> {
-    const document = await this.options.collection.findOne(key).exec();
+    const document = await this.findOneOrFail(key);
     await document.remove();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  upload(data: FormData): Promise<any> {
-    throw new Error('Method not implemented.');
+  async putMedia(key: string, data: Blob, params: MediaParams): Promise<any> {
+    const document = await this.findOneOrFail(key);
+
+    return await document.putAttachment({
+      id: params.name,
+      type: params.type,
+      data,
+    });
+  }
+
+  async removeMedia(key: string, name: string): Promise<void> {
+    const document = await this.findOneOrFail(key);
+
+    const attachment = document.getAttachment(name);
+    await attachment?.remove();
+  }
+
+  async allMedia(key: string): Promise<any[]> {
+    const document = await this.findOneOrFail(key);
+
+    return document.allAttachments();
   }
 
   link(params: LinkParams): void {
     this.linkParams = params;
+  }
+
+  private async findOneOrFail(key: string): Promise<RxDocument<T>> {
+    const document = await this.options.collection.findOne(key).exec();
+
+    if (!document) {
+      throw new Error('Record not found');
+    }
+
+    return document;
   }
 
   private async populate(document: RxDocument<T>, onlyArray: boolean = false): Promise<T> {
