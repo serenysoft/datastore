@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { DataStore, DataStoreOptions, FindOptions, LinkParams } from './DataStore';
 import { RxCollection, RxDocument } from 'rxdb';
 import { OfflineFindTransformer } from './transformers/OfflineFindTransformer';
@@ -49,7 +48,6 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
       result = await document.incrementalPatch(data);
     } else {
       const doc = {
-        [key]: uuidv4(),
         ...data,
         ...this.linkParams,
       };
