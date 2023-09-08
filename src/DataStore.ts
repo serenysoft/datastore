@@ -49,9 +49,11 @@ export interface DataStore<T = any> {
 
   link(params: LinkParams): void;
 
+  allMedia(key: string): Promise<any[]>;
+
+  getMedia(key: string, name: string): Promise<Blob>;
+
   putMedia(key: string, data: Blob, params: MediaParams): Promise<any>;
 
   removeMedia(key: string, name: string): Promise<void>;
-
-  allMedia(key: string): Promise<any[]>;
 }

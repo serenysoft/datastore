@@ -181,6 +181,11 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getMedia(key: string, name: string): Promise<Blob> {
+    throw new Error('Method not implemented.');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   allMedia(key: string): Promise<any[]> {
     throw new Error('Method not implemented.');
   }

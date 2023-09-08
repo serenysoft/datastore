@@ -75,6 +75,12 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     await attachment?.remove();
   }
 
+  async getMedia(key: string, name: string): Promise<Blob> {
+    const document = await this.findOneOrFail(key);
+    const attachment = document.getAttachment(name);
+    return attachment?.getData();
+  }
+
   async allMedia(key: string): Promise<any[]> {
     const document = await this.findOneOrFail(key);
 

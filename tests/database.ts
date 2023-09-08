@@ -1,7 +1,6 @@
 import { addRxPlugin, createRxDatabase } from 'rxdb';
-import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
+import { getRxStorageMemory } from 'rxdb/plugins/storage-memory';
 import { RxDBAttachmentsPlugin } from 'rxdb/plugins/attachments';
-import { indexedDB, IDBKeyRange } from 'fake-indexeddb';
 
 addRxPlugin(RxDBAttachmentsPlugin);
 
@@ -27,10 +26,7 @@ export const userSchema = {
 export async function initDatabase() {
   const database = await createRxDatabase({
     name: 'testdb',
-    storage: getRxStorageDexie({
-      indexedDB: indexedDB,
-      IDBKeyRange: IDBKeyRange,
-    }),
+    storage: getRxStorageMemory(),
   });
 
   await database.addCollections({
