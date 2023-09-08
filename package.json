@@ -130,9 +130,6 @@
     "coveragePathIgnorePatterns": [
       "/node_modules/",
       "/dist/"
-    ],
-    "setupFiles": [
-      "fake-indexeddb/auto"
     ]
   },
   "dependencies": {
