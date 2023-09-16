@@ -3,7 +3,6 @@ export type SearchSort = { [param: string]: 'asc' | 'desc' };
 export type SearchFieldType = 'number' | 'string' | 'datetime';
 export type SearchField = string | { [name: string]: SearchFieldType };
 export type MediaParams = Record<string, string | number | Blob> & {
-  id: string;
   name: string;
   type: string;
 };
