@@ -9,6 +9,7 @@ export interface Route {
 }
 
 export interface Request extends Route {
+  baseUrl?: string;
   data?: any;
   key?: string | number;
   wrap?: string;
