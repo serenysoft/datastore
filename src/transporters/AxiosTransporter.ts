@@ -18,6 +18,7 @@ export class AxiosTransporter<T = any> implements Transporter {
         method: request.method,
         headers: request.headers,
         params: request.params,
+        responseType: request.blob ? 'blob' : undefined,
         data,
       });
 
