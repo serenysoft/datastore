@@ -88,7 +88,7 @@ describe('Orion DataStore', () => {
     });
   });
 
-  it('GET / - Default options', async () => {
+  it('POST /search - Default options', async () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
@@ -98,13 +98,14 @@ describe('Orion DataStore', () => {
     await dataStore.findAll();
 
     expect(transporter.execute).toHaveBeenCalledWith({
-      method: 'GET',
+      method: 'POST',
       baseUrl: 'http://localhost/contacts',
+      action: 'search',
       wrap: 'data',
     });
   });
 
-  it('OPTIONS / - Custom options', async () => {
+  it('OPTIONS /search - Custom options', async () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
@@ -123,6 +124,7 @@ describe('Orion DataStore', () => {
       method: 'OPTIONS',
       baseUrl: 'http://localhost/contacts',
       path: 'index',
+      action: 'search',
       wrap: 'data',
     });
   });
@@ -365,7 +367,7 @@ describe('Orion DataStore', () => {
       },
       method: 'POST',
       baseUrl: 'http://localhost/contacts',
-      action: '/search',
+      action: 'search',
       wrap: 'data',
     });
   });

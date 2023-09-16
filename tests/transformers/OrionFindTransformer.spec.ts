@@ -5,13 +5,13 @@ describe('Orion - FindTransformer', () => {
     const trasformer = new OrionFindTransformer();
 
     let result = trasformer.execute(null);
-    expect(result).toBeNull();
+    expect(result).toEqual({ method: 'POST', action: 'search' });
 
     result = trasformer.execute(undefined);
-    expect(result).toBeNull();
+    expect(result).toEqual({ method: 'POST', action: 'search' });
 
     result = trasformer.execute({});
-    expect(result).toBeNull();
+    expect(result).toEqual({ method: 'POST', action: 'search' });
 
     result = trasformer.execute({
       limit: 5,
@@ -33,7 +33,7 @@ describe('Orion - FindTransformer', () => {
     });
 
     expect(result.method).toEqual('POST');
-    expect(result.action).toEqual('/search');
+    expect(result.action).toEqual('search');
     expect(result.params).toEqual({ limit: 5, page: 3, with_trashed: true });
     expect(result.data).toEqual({
       filters: [

@@ -13,8 +13,10 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
   };
 
   execute(data: FindOptions): any {
+    const result = { method: 'POST', action: 'search' };
+
     if (!data || isEmpty(data)) {
-      return null;
+      return result;
     }
 
     const paginate = data.limit && !isNil(data.skip);
@@ -58,10 +60,9 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     };
 
     return {
-      method: 'POST',
+      ...result,
       params: omitBy(params, isNil),
       data: omitBy(body, isNil),
-      action: '/search',
     };
   }
 }
