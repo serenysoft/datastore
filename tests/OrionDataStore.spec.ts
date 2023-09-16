@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { AxiosTransporter, OrionDataStore } from '../src';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 describe('Orion DataStore', () => {
   let transporter: AxiosTransporter;
@@ -368,57 +370,53 @@ describe('Orion DataStore', () => {
     });
   });
 
-  /*
-  it('POST /upload', async () => {
+  it('POST /media', async () => {
     const dataStore = new OrionDataStore({
       key: 'id',
-      baseUrl: 'http://testing.com/contacts',
+      baseUrl: 'http://testing.com/contacts/{contact}/media',
       transporter: transporter,
     });
 
-    const formData = new FormData();
-    formData.append('file', 'base64');
+    const type = 'image/png';
+    const file = readFileSync(resolve(__dirname, './fixtures/icon.png'));
+    const params = {
+      id: '1.1',
+      name: 'icon.png',
+      file: new Blob([file], { type }),
+      type,
+    };
 
-    await dataStore.upload(formData);
+    dataStore.link({ contact: 1 });
+
+    await dataStore.upload(params);
 
     expect(transporter.execute).toHaveBeenCalledWith({
-      baseUrl: 'http://testing.com/contacts',
+      baseUrl: 'http://testing.com/contacts/1/media',
       method: 'POST',
-      path: 'upload',
-      data: formData,
+      blob: true,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+      data: params,
     });
   });
 
-  it('PUT /custom-upload', async () => {
+  it('GET /media/{id}', async () => {
     const dataStore = new OrionDataStore({
       key: 'id',
-      baseUrl: 'http://testing.com/contacts',
+      baseUrl: 'http://testing.com/contacts/{contact}/media',
       transporter: transporter,
-      routes: {
-        upload: {
-          path: 'custom-upload',
-          method: 'PUT',
-        },
-      },
     });
 
-    const formData = new FormData();
-    formData.append('file', 'base64');
+    dataStore.link({ contact: 1 });
 
-    await dataStore.upload(formData);
+    await dataStore.download('2');
 
     expect(transporter.execute).toHaveBeenCalledWith({
-      baseUrl: 'http://testing.com/contacts',
-      method: 'PUT',
-      path: 'custom-upload',
-      data: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      baseUrl: 'http://testing.com/contacts/1/media',
+      method: 'GET',
+      path: '2',
+      blob: true,
     });
   });
-  */
 });

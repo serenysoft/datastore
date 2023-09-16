@@ -18,6 +18,7 @@ export interface RestRoutes {
   validate?: RestRequest;
   show?: RestRequest;
   upload?: RestRequest;
+  download?: RestRequest;
 }
 
 export interface RestParamNames {
@@ -40,7 +41,7 @@ export interface RestDataStoreOptions extends DataStoreOptions {
 
 export abstract class RestDataStore<T = any> implements DataStore<T> {
   private linkParams: LinkParams;
-  private readonly macro = /\{\w+\}/;
+  private readonly macro = /\{(\w+)\}/;
 
   constructor(protected options: RestDataStoreOptions) {}
 
@@ -155,12 +156,11 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return result;
   }
 
-  async putMedia(key: string, data: Blob, params: MediaParams): Promise<any> {
+  async upload(params: MediaParams): Promise<any> {
     const result = await this.execute({
-      key,
       method: 'POST',
-      path: 'media',
-      data: { ...data, ...params },
+      data: params,
+      blob: true,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -170,32 +170,24 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     return result;
   }
 
-  async removeMedia(key: string, name: string): Promise<void> {
-    await this.execute({
-      key,
-      method: 'DELETE',
-      path: 'media',
-      action: name,
-      ...this.options.routes?.upload,
+  async download(key: string): Promise<Blob> {
+    const result = await this.execute({
+      method: 'GET',
+      path: key,
+      blob: true,
+      ...this.options.routes?.download,
     });
+
+    return result;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getMedia(key: string, name: string): Promise<Blob> {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  allMedia(key: string): Promise<any[]> {
-    throw new Error('Method not implemented.');
-  }
-
-  public async execute(route: Request) {
+  async execute(route: Request) {
     const request = {
-      baseUrl: this.options.baseUrl,
+      baseUrl: this.formatMacro(this.options.baseUrl),
       ...route,
+      path: this.formatMacro(route.path),
+      action: this.formatMacro(route.action),
       params: omitBy(route.params, isNil),
-      link: this.linkParams,
     };
 
     if (isEmpty(request.params)) {
@@ -207,6 +199,17 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
     }
 
     return await this.options.transporter.execute(request);
+  }
+
+  protected formatMacro(text: string): string {
+    if (!text) {
+      return text;
+    }
+
+    return text.replace(this.macro, (match, key) => {
+      const value = this.linkParams[key] as string;
+      return value || '';
+    });
   }
 
   protected hasInvalidLink(): boolean {

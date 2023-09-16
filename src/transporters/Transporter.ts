@@ -1,7 +1,5 @@
 export type RequestHeaders = Record<string, string | number | boolean>;
-export type RequestParams = {
-  [key: string]: string | number | object | boolean;
-};
+export type RequestParams = Record<string, string | number | object | boolean>;
 
 export interface Route {
   path?: string;
@@ -15,7 +13,7 @@ export interface Request extends Route {
   key?: string | number;
   wrap?: string;
   action?: string;
-  link?: Record<string, string | number | boolean>;
+  blob?: boolean;
 }
 
 export interface Transporter<R = any> {

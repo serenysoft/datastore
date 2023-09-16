@@ -51,9 +51,7 @@ describe('Axios Provider', () => {
     const http = axios.create();
     const provider = new AxiosTransporter(http);
 
-    const request = jest
-      .spyOn(http, 'request')
-      .mockReturnValue(Promise.resolve({}));
+    const request = jest.spyOn(http, 'request').mockReturnValue(Promise.resolve({}));
 
     await provider.execute({
       path: '/users',
@@ -69,29 +67,6 @@ describe('Axios Provider', () => {
       method: 'POST',
       url: 'users',
       headers: undefined,
-      params: undefined,
-    });
-  });
-
-  it.skip('should replace macros in url', async () => {
-    const http = axios.create();
-    const provider = new AxiosTransporter(http);
-
-    const request = jest
-      .spyOn(http, 'request')
-      .mockReturnValue(Promise.resolve({}));
-
-    await provider.execute({
-      path: '/users/{user}/permissions',
-      method: 'GET',
-      link: { user: 1 },
-    });
-
-    expect(request).toHaveBeenCalledWith({
-      url: 'users/1/permissions',
-      data: {},
-      headers: undefined,
-      method: 'GET',
       params: undefined,
     });
   });

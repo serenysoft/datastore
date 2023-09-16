@@ -58,33 +58,14 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     await document.remove();
   }
 
-  async putMedia(key: string, data: Blob, params: MediaParams): Promise<any> {
-    const document = await this.findOneOrFail(key);
-
-    return await document.putAttachment({
-      id: params.name,
-      type: params.type,
-      data,
-    });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  download(key: string): Promise<Blob> {
+    throw new Error('Feature not supported.');
   }
 
-  async removeMedia(key: string, name: string): Promise<void> {
-    const document = await this.findOneOrFail(key);
-
-    const attachment = document.getAttachment(name);
-    await attachment?.remove();
-  }
-
-  async getMedia(key: string, name: string): Promise<Blob> {
-    const document = await this.findOneOrFail(key);
-    const attachment = document.getAttachment(name);
-    return attachment?.getData();
-  }
-
-  async allMedia(key: string): Promise<any[]> {
-    const document = await this.findOneOrFail(key);
-
-    return document.allAttachments();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  upload(params: MediaParams): Promise<any> {
+    throw new Error('Feature not supported.');
   }
 
   link(params: LinkParams): void {
