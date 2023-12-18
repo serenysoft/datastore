@@ -1,3 +1,4 @@
+import { flatMap } from 'lodash';
 import { OfflineFindTransformer } from '../../src/transformers/OfflineFindTransformer';
 
 describe('Offline - FindTransformer', () => {
@@ -36,6 +37,7 @@ describe('Offline - FindTransformer', () => {
       ],
       filter: {
         active: true,
+        scope: undefined,
       },
     });
 
@@ -49,6 +51,9 @@ describe('Offline - FindTransformer', () => {
       },
       sort: [{ category: 'asc' }, { age: 'desc' }, { name: 'asc' }],
     });
+
+    const keys = flatMap(result.selector.$and, (obj) => Object.keys(obj));
+    expect(keys).not.toContain('scope');
   });
 
   it('Should transform default sort only when sort options was not defined', async () => {

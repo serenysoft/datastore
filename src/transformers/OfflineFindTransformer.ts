@@ -13,6 +13,10 @@ export class OfflineFindTransformer implements Transformer<FindOptions> {
     let selector = data.filter;
     const sort = data.sort || [];
 
+    if (selector) {
+      selector = omitBy(data.filter, isNil);
+    }
+
     if (data.group?.length) {
       const groups = data.group?.map((group) => ({
         selector: group.selector,
@@ -28,7 +32,7 @@ export class OfflineFindTransformer implements Transformer<FindOptions> {
     }
 
     const result: any = {
-      selector: selector,
+      selector,
       limit: data.limit,
       skip: data.skip,
     };
