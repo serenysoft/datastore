@@ -1,6 +1,7 @@
-import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 import { RxCollection, RxDocument } from 'rxdb';
+import { pick } from 'lodash';
 import { OfflineFindTransformer } from './transformers/OfflineFindTransformer';
+import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 
 export interface OfflineDataStoreOptions<T = any> extends DataStoreOptions {
   collection: RxCollection<T>;
@@ -36,12 +37,12 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
   }
 
   async insert(data: T): Promise<any> {
-    const doc = {
+    const document = this.normalize({
       ...data,
       ...this.linkParams,
-    };
+    });
 
-    const result = await this.options.collection.insert(doc);
+    const result = await this.options.collection.insert(document);
     return result.toMutableJSON();
   }
 
@@ -106,8 +107,9 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
   }
 
   private normalize(data: any): T {
-    const references = Object.entries(this.collectionReferences());
     const result = { ...data };
+    const keys = Object.keys(this.options.collection.schema.jsonSchema.properties);
+    const references = Object.entries(this.collectionReferences());
 
     for (const [key, value] of references) {
       const collection = this.options.collection.database.collections[value.ref];
@@ -118,7 +120,10 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
       }
     }
 
-    return result;
+    const raw = pick(result, keys) as T;
+    console.log(raw);
+
+    return raw;
   }
 
   private collectionReferences(): Record<string, any> {
