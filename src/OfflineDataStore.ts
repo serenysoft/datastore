@@ -120,10 +120,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
       }
     }
 
-    const raw = pick(result, keys) as T;
-    console.log(raw);
-
-    return raw;
+    return pick(result, keys) as T;
   }
 
   private collectionReferences(): Record<string, any> {
