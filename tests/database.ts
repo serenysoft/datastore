@@ -17,6 +17,9 @@ export const userSchema = {
     name: {
       type: 'string',
     },
+    profileId: {
+      type: 'number',
+    },
   },
   attachments: {
     encrypted: false,

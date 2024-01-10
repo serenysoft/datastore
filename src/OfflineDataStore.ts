@@ -38,8 +38,8 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
 
   async insert(data: T): Promise<any> {
     const document = this.normalize({
-      ...data,
       ...this.linkParams,
+      ...data,
     });
 
     const result = await this.options.collection.insert(document);
