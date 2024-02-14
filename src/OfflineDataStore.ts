@@ -18,7 +18,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
 
   async findOne(key: string): Promise<T> {
     const document = await this.options.collection.findOne(key).exec();
-    return document && !document.deleted ? this.populate(document, true) : null;
+    return document && !document.deleted ? this.populate(document) : null;
   }
 
   async findAll(options?: FindOptions): Promise<T[]> {
@@ -83,7 +83,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
     return document;
   }
 
-  private async populate(document: RxDocument<T>, onlyArray: boolean = false): Promise<T> {
+  private async populate(document: RxDocument<T>): Promise<T> {
     const result: any = document.toMutableJSON();
 
     for (const [key, value] of Object.entries(this.collectionReferences())) {
@@ -97,7 +97,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
       } else {
         if (isArray) {
           result[key] = reference.map((item: RxDocument<T>) => item.toMutableJSON());
-        } else if (!onlyArray) {
+        } else {
           result[key.replace('_id', '')] = reference.toMutableJSON();
         }
       }
