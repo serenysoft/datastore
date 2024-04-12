@@ -9,6 +9,7 @@ export interface OfflineDataStoreOptions<T = any> extends DataStoreOptions {
 
 export class OfflineDataStore<T = any> implements DataStore<T> {
   private linkParams: LinkParams;
+  private readonly foreignKeySuffix = /(_id|Id)$/;
 
   constructor(private options: OfflineDataStoreOptions<T>) {}
 
@@ -98,7 +99,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
         if (isArray) {
           result[key] = reference.map((item: RxDocument<T>) => item.toMutableJSON());
         } else {
-          result[key.replace(/(_id|Id)$/, '')] = reference.toMutableJSON();
+          result[key.replace(this.foreignKeySuffix, '')] = reference.toMutableJSON();
         }
       }
     }
