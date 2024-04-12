@@ -41,4 +41,15 @@ describe('Offline DataStore', () => {
     const result = await dataStore.findOne('1');
     expect(result.profileId).toBe(2);
   });
+
+  it('Should build referenced properties', async () => {
+    await database.collections.countries.insert({ id: '1', name: 'Brazil' });
+    await database.collections.categories.insert({ id: '1', name: 'Admin' });
+    await dataStore.insert({ id: '1', name: 'Bill', categoryId: '1', country_id: '1' });
+
+    const result = await dataStore.findOne('1');
+    expect(result.category).toBeTruthy();
+    expect(result.country).toBeTruthy();
+  });
+
 });

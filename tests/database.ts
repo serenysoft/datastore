@@ -20,6 +20,52 @@ export const userSchema = {
     profileId: {
       type: 'number',
     },
+    categoryId: {
+      ref: "categories",
+      type: "string"
+    },
+    country_id: {
+      ref: "countries",
+      type: "string"
+    },
+  },
+  attachments: {
+    encrypted: false,
+  },
+};
+
+export const categorySchema = {
+  version: 0,
+  description: 'The category schema',
+  primaryKey: 'id',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      maxLength: 100,
+    },
+    name: {
+      type: 'string',
+    },
+  },
+  attachments: {
+    encrypted: false,
+  },
+};
+
+export const countrySchema = {
+  version: 0,
+  description: 'The country schema',
+  primaryKey: 'id',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      maxLength: 100,
+    },
+    name: {
+      type: 'string',
+    },
   },
   attachments: {
     encrypted: false,
@@ -35,6 +81,12 @@ export async function initDatabase() {
   await database.addCollections({
     users: {
       schema: userSchema,
+    },
+    categories: {
+      schema: categorySchema,
+    },
+    countries: {
+      schema: countrySchema,
     },
   });
 
