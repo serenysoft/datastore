@@ -39,11 +39,15 @@ export interface RestDataStoreOptions extends DataStoreOptions {
   transporter: Transporter;
 }
 
-export abstract class RestDataStore<T = any> implements DataStore<T> {
+export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
+  implements DataStore<T>
+{
   private linkParams: LinkParams;
   private readonly macro = /\{(\w+)\}/;
 
-  constructor(protected options: RestDataStoreOptions) {}
+  constructor(protected options: O) {
+    this.options = options;
+  }
 
   key(): string {
     return this.options.key;
@@ -64,7 +68,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
         key: key,
         wrap: this.options.wrap,
       },
-      this.options.routes?.show
+      this.options.routes?.show,
     );
 
     const result = await this.execute(request);
@@ -89,7 +93,7 @@ export abstract class RestDataStore<T = any> implements DataStore<T> {
         wrap: this.options.wrap,
       },
       route,
-      this.options.routes?.index
+      this.options.routes?.index,
     );
 
     const result = await this.execute(request);

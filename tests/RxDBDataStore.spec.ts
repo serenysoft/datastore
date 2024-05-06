@@ -51,5 +51,4 @@ describe('Offline DataStore', () => {
     expect(result.category).toBeTruthy();
     expect(result.country).toBeTruthy();
   });
-
 });

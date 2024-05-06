@@ -7,11 +7,29 @@ export interface OrionDataStoreOptions extends RestDataStoreOptions {
   attachable?: boolean;
 }
 
-export class OrionDataStore<T = any> extends RestDataStore<T> {
-  public constructor(protected options: OrionDataStoreOptions) {
-    const opts = { ...options, wrap: options.wrap || 'data' };
-    super(opts);
-    this.options = opts;
+export class OrionDataStore<T = any> extends RestDataStore<OrionDataStoreOptions, T> {
+  public constructor({
+    search,
+    key,
+    baseUrl,
+    headers,
+    routes,
+    paramNames,
+    transporter,
+    wrap = 'data',
+    attachable,
+  }: OrionDataStoreOptions) {
+    super({
+      search,
+      key,
+      baseUrl,
+      headers,
+      routes,
+      paramNames,
+      transporter,
+      wrap,
+      attachable,
+    });
   }
 
   public async insert(data: T): Promise<any> {

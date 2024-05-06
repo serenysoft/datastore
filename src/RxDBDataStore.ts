@@ -3,7 +3,7 @@ import { pick } from 'lodash';
 import { OfflineFindTransformer } from './transformers/OfflineFindTransformer';
 import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 
-export interface OfflineDataStoreOptions<T = any> extends DataStoreOptions {
+export interface RxDBDataStoreOptions<T = any> extends DataStoreOptions {
   collection: RxCollection<T>;
 }
 
@@ -11,7 +11,7 @@ export class OfflineDataStore<T = any> implements DataStore<T> {
   private linkParams: LinkParams;
   private readonly foreignKeySuffix = /(_id|Id)$/;
 
-  constructor(private options: OfflineDataStoreOptions<T>) {}
+  constructor(private options: RxDBDataStoreOptions<T>) {}
 
   key(): string {
     return this.options.collection.schema.primaryPath;

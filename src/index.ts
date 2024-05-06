@@ -1,5 +1,5 @@
 export * from './DataStore';
-export * from './OfflineDataStore';
+export * from './RxDBDataStore';
 export * from './OrionDataStore';
 
 export * from './transporters/AxiosTransporter';
