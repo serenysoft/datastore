@@ -37,6 +37,10 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
     return document !== null;
   }
 
+  async count(condition?: any): Promise<number> {
+    return this.options.collection.count({ selector: condition }).exec();
+  }
+
   async insert(data: T): Promise<any> {
     const document = this.normalize({
       ...this.linkParams,
