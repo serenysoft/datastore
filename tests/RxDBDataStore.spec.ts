@@ -1,14 +1,14 @@
 import { RxDatabase } from 'rxdb';
 import { initDatabase } from './database';
-import { OfflineDataStore } from '../src';
+import { RxDBDataStore } from '../src';
 
 describe('Offline DataStore', () => {
   let database: RxDatabase;
-  let dataStore: OfflineDataStore;
+  let dataStore: RxDBDataStore;
 
   beforeEach(async () => {
     database = await initDatabase();
-    dataStore = new OfflineDataStore({
+    dataStore = new RxDBDataStore({
       collection: database.collections.users,
     });
   });

@@ -7,7 +7,7 @@ export interface RxDBDataStoreOptions<T = any> extends DataStoreOptions {
   collection: RxCollection<T>;
 }
 
-export class OfflineDataStore<T = any> implements DataStore<T> {
+export class RxDBDataStore<T = any> implements DataStore<T> {
   private linkParams: LinkParams;
   private readonly foreignKeySuffix = /(_id|Id)$/;
 

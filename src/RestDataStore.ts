@@ -45,9 +45,7 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
   private linkParams: LinkParams;
   private readonly macro = /\{(\w+)\}/;
 
-  constructor(protected options: O) {
-    this.options = options;
-  }
+  constructor(protected options: O) {}
 
   key(): string {
     return this.options.key;
