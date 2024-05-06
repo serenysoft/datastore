@@ -44,6 +44,8 @@ export interface DataStore<T = any> {
 
   exists(options: any): Promise<boolean>;
 
+  count(options: any): Promise<number>;
+
   insert(data: T): Promise<any>;
 
   update(data: T): Promise<any>;

@@ -24,6 +24,19 @@ describe('Offline DataStore', () => {
     expect(result).toBe(true);
   });
 
+  it('Should check document count', async () => {
+    let result = await dataStore.count();
+    expect(result).toBe(0);
+
+    await dataStore.insert({ id: '1', name: 'Bill' });
+
+    result = await dataStore.count({ name: 'Bill' });
+    expect(result).toBe(1);
+
+    result = await dataStore.count({ name: 'Jeff' });
+    expect(result).toBe(0);
+  });
+
   it('Should assign link properties', async () => {
     dataStore.link({ profileId: 1 });
 
