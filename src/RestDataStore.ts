@@ -106,6 +106,10 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     return !!result.length;
   }
 
+  async count(condition: any): Promise<number> {
+    throw new Error('Feature not supported.');
+  }
+
   async insert(data: T): Promise<any> {
     const result = await this.execute({
       method: 'POST',
