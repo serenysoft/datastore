@@ -5,6 +5,7 @@ import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } fro
 
 export interface RxDBDataStoreOptions<T = any> extends DataStoreOptions {
   collection: RxCollection<T>;
+  key?: string;
 }
 
 export class RxDBDataStore<T = any> implements DataStore<T> {
@@ -13,12 +14,19 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
 
   constructor(private options: RxDBDataStoreOptions<T>) {}
 
+  collection(): RxCollection {
+    return this.options.collection;
+  }
+
   key(): string {
-    return this.options.collection.schema.primaryPath;
+    return this.options.key || this.collection().schema.primaryPath;
   }
 
   async findOne(key: string): Promise<T> {
-    const document = await this.options.collection.findOne(key).exec();
+    const { primaryPath } = this.collection().schema;
+    const condition = this.key() !== primaryPath ? { selector: { [this.key()]: key } } : key;
+
+    const document = await this.collection().findOne(condition).exec();
     return document && !document.deleted ? this.populate(document) : null;
   }
 
@@ -26,19 +34,19 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
     const transformer = new OfflineFindTransformer(this.options.search);
 
     const queryOptions = transformer.execute(options);
-    const query = this.options.collection.find(queryOptions);
+    const query = this.collection().find(queryOptions);
     const results = await query.exec();
 
     return Promise.all(results.map((result) => this.populate(result)));
   }
 
   async exists(condition: any): Promise<boolean> {
-    const document = await this.options.collection.findOne({ selector: condition }).exec();
+    const document = await this.collection().findOne({ selector: condition }).exec();
     return document !== null;
   }
 
   async count(condition?: any): Promise<number> {
-    return this.options.collection.count({ selector: condition }).exec();
+    return this.collection().count({ selector: condition }).exec();
   }
 
   async insert(data: T): Promise<any> {
@@ -47,7 +55,7 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
       ...data,
     });
 
-    const result = await this.options.collection.insert(document);
+    const result = await this.collection().insert(document);
     return result.toMutableJSON();
   }
 
@@ -79,7 +87,7 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
   }
 
   private async findOneOrFail(key: string): Promise<RxDocument<T>> {
-    const document = await this.options.collection.findOne(key).exec();
+    const document = await this.collection().findOne(key).exec();
 
     if (!document) {
       throw new Error('Record not found');
@@ -113,11 +121,11 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
 
   private normalize(data: any): T {
     const result = { ...data };
-    const keys = Object.keys(this.options.collection.schema.jsonSchema.properties);
+    const keys = Object.keys(this.collection().schema.jsonSchema.properties);
     const references = Object.entries(this.collectionReferences());
 
     for (const [key, value] of references) {
-      const collection = this.options.collection.database.collections[value.ref];
+      const collection = this.collection().database.collections[value.ref];
       const primaryPath = collection.schema.primaryPath as string;
 
       if (value.type === 'array') {
@@ -130,7 +138,7 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
 
   private collectionReferences(): Record<string, any> {
     const result: Record<string, object> = {};
-    const entries = Object.entries(this.options.collection.schema.jsonSchema.properties);
+    const entries = Object.entries(this.collection().schema.jsonSchema.properties);
 
     for (const [key, value] of entries) {
       if (value.ref) {

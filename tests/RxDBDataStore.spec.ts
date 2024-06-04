@@ -17,6 +17,21 @@ describe('Offline DataStore', () => {
     await database.remove();
   });
 
+  it('Should find record by alternative key', async () => {
+    const categoryDataStore = new RxDBDataStore({
+      key: 'name',
+      collection: database.collections.categories,
+    });
+
+    await categoryDataStore.insert({ id: '1', name: 'Technology' });
+
+    let result = await categoryDataStore.findOne('Technology');
+    expect(result).toBeTruthy();
+
+    result = await categoryDataStore.findOne('1');
+    expect(result).toBe(null);
+  });
+
   it('Should check document exists', async () => {
     await dataStore.insert({ id: '1', name: 'Bill' });
 

@@ -106,6 +106,7 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     return !!result.length;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async count(condition: any): Promise<number> {
     throw new Error('Feature not supported.');
   }

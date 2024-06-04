@@ -21,12 +21,12 @@ export const userSchema = {
       type: 'number',
     },
     categoryId: {
-      ref: "categories",
-      type: "string"
+      ref: 'categories',
+      type: 'string',
     },
     country_id: {
-      ref: "countries",
-      type: "string"
+      ref: 'countries',
+      type: 'string',
     },
   },
   attachments: {
