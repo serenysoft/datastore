@@ -1,5 +1,5 @@
 import { RxCollection, RxDocument } from 'rxdb';
-import { pick } from 'lodash';
+import { isPlainObject, pick } from 'lodash';
 import { OfflineFindTransformer } from './transformers/OfflineFindTransformer';
 import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 
@@ -22,11 +22,21 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
     return this.options.key || this.collection().schema.primaryPath;
   }
 
-  async findOne(key: string): Promise<T> {
-    const { primaryPath } = this.collection().schema;
-    const condition = this.key() !== primaryPath ? { selector: { [this.key()]: key } } : key;
+  async findOne(key: any): Promise<T> {
+    let query;
 
-    const document = await this.collection().findOne(condition).exec();
+    if (isPlainObject(key)) {
+      query = key;
+    } else {
+      const { primaryPath } = this.collection().schema;
+      query = this.key() !== primaryPath ? { [this.key()]: key } : key;
+    }
+
+    if (isPlainObject(query)) {
+      query = { selector: query };
+    }
+
+    const document = await this.collection().findOne(query).exec();
     return document && !document.deleted ? this.populate(document) : null;
   }
 

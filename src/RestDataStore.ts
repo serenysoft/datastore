@@ -55,7 +55,7 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     this.linkParams = params;
   }
 
-  async findOne(key: string): Promise<T> {
+  async findOne(key: any): Promise<T> {
     if (this.hasInvalidLink()) {
       throw new Error('The link data must be set');
     }

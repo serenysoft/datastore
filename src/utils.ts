@@ -14,7 +14,7 @@ export function serializeDates(data: object): any {
 
     if (Array.isArray(value)) {
       result[attribute] = value.map((element: any) =>
-        isObjectLike(element) ? serializeDates(element) : element
+        isObjectLike(element) ? serializeDates(element) : element,
       );
     } else if (value instanceof Date) {
       const date = DateTime.fromJSDate(value);
