@@ -1,9 +1,9 @@
 import { flatMap } from 'lodash';
-import { OfflineFindTransformer } from '../../src/transformers/OfflineFindTransformer';
+import { RxDBFindTransformer } from '../../src/transformers/RxDBFindTransformer';
 
 describe('Offline - FindTransformer', () => {
   it('Should transform find options by nullish values', async () => {
-    const trasformer = new OfflineFindTransformer({
+    const trasformer = new RxDBFindTransformer({
       fields: ['name', { age: 'number' }],
     });
 
@@ -18,7 +18,7 @@ describe('Offline - FindTransformer', () => {
   });
 
   it('Should transform find options', async () => {
-    const trasformer = new OfflineFindTransformer({
+    const trasformer = new RxDBFindTransformer({
       fields: ['name', { age: 'number' }],
       sort: {
         age: 'asc',
@@ -57,7 +57,7 @@ describe('Offline - FindTransformer', () => {
   });
 
   it('Should transform default sort only when sort options was not defined', async () => {
-    const trasformer = new OfflineFindTransformer({
+    const trasformer = new RxDBFindTransformer({
       fields: ['name', { age: 'number' }],
       sort: {
         age: 'asc',

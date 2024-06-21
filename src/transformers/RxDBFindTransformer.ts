@@ -2,7 +2,7 @@ import { isEmpty, isNil, omitBy } from 'lodash';
 import { Transformer } from './Transformer';
 import { FindOptions, Search } from '../DataStore';
 
-export class OfflineFindTransformer implements Transformer<FindOptions> {
+export class RxDBFindTransformer implements Transformer<FindOptions> {
   constructor(private search: Search) {}
 
   execute(data: FindOptions): any {
@@ -38,7 +38,7 @@ export class OfflineFindTransformer implements Transformer<FindOptions> {
     };
 
     if (sort.length) {
-      result.sort = sort.map((order) => ({ [order.selector]: order.desc ? 'desc' : 'asc' } as any));
+      result.sort = sort.map((order) => ({ [order.selector]: order.desc ? 'desc' : 'asc' }) as any);
     } else if (this.search?.sort) {
       result.sort = [];
       for (const [key, value] of Object.entries(this.search.sort)) {

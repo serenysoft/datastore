@@ -38,7 +38,7 @@ export interface DataStoreOptions {
 export interface DataStore<T = any> {
   key(): string;
 
-  findOne(key: any): Promise<T>;
+  findOne(key: string | FindOptions): Promise<T>;
 
   findAll(options?: FindOptions): Promise<T[]>;
 

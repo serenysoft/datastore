@@ -25,10 +25,14 @@ describe('Offline DataStore', () => {
 
     await categoryDataStore.insert({ id: '1', name: 'Science' });
 
-    let result = await categoryDataStore.findOne({ id: '1', name: 'Science' });
+    let result = await categoryDataStore.findOne({
+      filter: { id: '1', name: 'Science' },
+    });
     expect(result).toBeTruthy();
 
-    result = await categoryDataStore.findOne({ id: '1', name: 'Technology' });
+    result = await categoryDataStore.findOne({
+      filter: { id: '1', name: 'Technology' },
+    });
     expect(result).toBe(null);
   });
 

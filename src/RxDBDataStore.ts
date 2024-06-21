@@ -1,6 +1,6 @@
 import { RxCollection, RxDocument } from 'rxdb';
-import { isPlainObject, pick } from 'lodash';
-import { OfflineFindTransformer } from './transformers/OfflineFindTransformer';
+import { pick } from 'lodash';
+import { RxDBFindTransformer } from './transformers/RxDBFindTransformer';
 import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 
 export interface RxDBDataStoreOptions<T = any> extends DataStoreOptions {
@@ -22,18 +22,15 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
     return this.options.key || this.collection().schema.primaryPath;
   }
 
-  async findOne(key: any): Promise<T> {
+  async findOne(key: string | FindOptions): Promise<T> {
     let query;
 
-    if (isPlainObject(key)) {
-      query = key;
-    } else {
+    if (typeof key === 'string') {
       const { primaryPath } = this.collection().schema;
-      query = this.key() !== primaryPath ? { [this.key()]: key } : key;
-    }
-
-    if (isPlainObject(query)) {
-      query = { selector: query };
+      query = this.key() !== primaryPath ? { selector: { [this.key()]: key } } : key;
+    } else {
+      const transformer = new RxDBFindTransformer(this.options.search);
+      query = transformer.execute(key);
     }
 
     const document = await this.collection().findOne(query).exec();
@@ -41,7 +38,7 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
   }
 
   async findAll(options?: FindOptions): Promise<T[]> {
-    const transformer = new OfflineFindTransformer(this.options.search);
+    const transformer = new RxDBFindTransformer(this.options.search);
 
     const queryOptions = transformer.execute(options);
     const query = this.collection().find(queryOptions);
