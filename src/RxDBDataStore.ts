@@ -136,7 +136,9 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
       const primaryPath = collection.schema.primaryPath as string;
 
       if (value.type === 'array') {
-        result[key] = (data[key] || []).map((reference: any) => reference[primaryPath]);
+        result[key] = (data[key] || []).map((reference: any) =>
+          typeof reference === 'string' ? reference : reference[primaryPath],
+        );
       }
     }
 
