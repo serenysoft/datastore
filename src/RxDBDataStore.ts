@@ -1,5 +1,5 @@
 import { RxCollection, RxDocument } from 'rxdb';
-import { pick } from 'lodash';
+import { isNil, pick } from 'lodash';
 import { RxDBFindTransformer } from './transformers/RxDBFindTransformer';
 import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 
@@ -29,6 +29,10 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
       const { primaryPath } = this.collection().schema;
       query = this.key() !== primaryPath ? { selector: { [this.key()]: key } } : key;
     } else {
+      if (!this.validateLinkParams()) {
+        return null;
+      }
+
       const transformer = new RxDBFindTransformer(this.options.search);
       query = transformer.execute(key);
     }
@@ -38,8 +42,11 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
   }
 
   async findAll(options?: FindOptions): Promise<T[]> {
-    const transformer = new RxDBFindTransformer(this.options.search);
+    if (!this.validateLinkParams()) {
+      return [];
+    }
 
+    const transformer = new RxDBFindTransformer(this.options.search);
     const queryOptions = transformer.execute(options);
     const query = this.collection().find(queryOptions);
     const results = await query.exec();
@@ -91,6 +98,17 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
 
   link(params: LinkParams): void {
     this.linkParams = params;
+  }
+
+  private validateLinkParams(): boolean {
+    if (!this.linkParams) {
+      return true;
+    }
+
+    const keys = Object.keys(this.linkParams);
+    const values = Object.values(this.linkParams).filter((value) => !isNil(value));
+
+    return keys.length === values.length;
   }
 
   private async findOneOrFail(key: string): Promise<RxDocument<T>> {
