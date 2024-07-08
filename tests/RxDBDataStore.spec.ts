@@ -101,6 +101,25 @@ describe('Offline DataStore', () => {
     expect(result).toBeNull();
   });
 
+  it('Should includes link params to filter options', async () => {
+    await database.collections.users.insert({ id: '1', name: 'Bill', profileId: 1 });
+    await database.collections.users.insert({ id: '2', name: 'Jeff', profileId: 2 });
+
+    dataStore.link({ profileId: 1 });
+
+    let results = await dataStore.findAll();
+    expect(results.length).toBe(1);
+
+    results = await dataStore.findAll({ filter: { name: 'Jeff' } });
+    expect(results.length).toBe(0);
+
+    let result = await dataStore.findOne('2'); // should ignore link
+    expect(result.name).toEqual('Jeff');
+
+    result = await dataStore.findOne({ filter: { name: 'Bill' } });
+    expect(result).not.toBeNull();
+  });
+
   it('Should populate ref properties', async () => {
     await database.collections.countries.insert({ id: '1', name: 'Brazil' });
     await database.collections.categories.insert({ id: '1', name: 'Admin' });
