@@ -3,7 +3,7 @@ import { DataStore, DataStoreOptions, LinkParams, MediaParams } from './DataStor
 import { FindOptions } from './DataStore';
 import { Transformer } from './transformers/Transformer';
 import { serializeDates } from './utils';
-import { Request, Transporter } from './transporters/Transporter';
+import { executeRequest, Request, Transporter } from './Transporter';
 
 export interface RestRequest extends Request {
   baseUrl?: string;
@@ -205,7 +205,7 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
       request.data = serializeDates(request.data);
     }
 
-    return await this.options.transporter.execute(request);
+    return await executeRequest(request, this.options.transporter);
   }
 
   protected formatMacro(text: string): string {

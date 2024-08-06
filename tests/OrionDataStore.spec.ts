@@ -1,26 +1,23 @@
-import axios from 'axios';
-import { AxiosTransporter, OrionDataStore } from '../src';
+import { OrionDataStore, Transporter } from '../src';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 
 describe('Orion DataStore', () => {
-  let transporter: AxiosTransporter;
-  let executeMock: jest.FunctionProperties<any>;
+  let transporter: Transporter;
 
   beforeEach(() => {
-    transporter = new AxiosTransporter(axios.create());
-    executeMock = jest.spyOn(transporter, 'execute').mockReturnValue(null);
+    transporter = jest.fn().mockReturnValue(Promise.resolve({}));
   });
 
   it('Should return first element when result is an array', async () => {
+    const contact = { id: '1', name: 'Bill' };
+
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter: () => Promise.resolve({ data: contact }),
     });
 
-    const contact = { id: '1', name: 'Bill' };
-    executeMock.mockReturnValue(Promise.resolve(contact));
     const result = await dataStore.findOne('1');
     expect(result).toEqual(contact);
   });
@@ -29,10 +26,8 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter: () => Promise.resolve({ data: [] }),
     });
-
-    executeMock.mockReturnValue(Promise.resolve([]));
 
     const result = await dataStore.findOne('1');
     expect(result).toBeNull();
@@ -42,12 +37,12 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     await dataStore.findOne('1');
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       method: 'GET',
       key: '1',
       baseUrl: 'http://localhost/contacts',
@@ -56,9 +51,7 @@ describe('Orion DataStore', () => {
   });
 
   it('OPTIONS /{id} - Custom options', async () => {
-    const headers = {
-      'Accept': 'application/json',
-    };
+    const headers = { 'Accept': 'application/json' };
 
     const dataStore = new OrionDataStore({
       key: 'id',
@@ -71,12 +64,12 @@ describe('Orion DataStore', () => {
         },
       },
       headers: headers,
-      transporter: transporter,
+      transporter,
     });
 
     await dataStore.findOne('1');
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       key: '1',
       method: 'OPTIONS',
@@ -92,12 +85,12 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     await dataStore.findAll();
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       method: 'POST',
       baseUrl: 'http://localhost/contacts',
       action: 'search',
@@ -109,7 +102,7 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
       routes: {
         index: {
           path: 'index',
@@ -120,7 +113,7 @@ describe('Orion DataStore', () => {
 
     await dataStore.findAll();
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       method: 'OPTIONS',
       baseUrl: 'http://localhost/contacts',
       path: 'index',
@@ -133,13 +126,13 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     const data = { name: 'Bill' };
     await dataStore.insert(data);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       data: data,
       method: 'POST',
       baseUrl: 'http://localhost/contacts',
@@ -157,13 +150,13 @@ describe('Orion DataStore', () => {
           method: 'PATCH',
         },
       },
-      transporter: transporter,
+      transporter,
     });
 
     const data = { name: 'Bill' };
     await dataStore.insert(data);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'PATCH',
       path: 'create',
@@ -176,13 +169,13 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     const data = { id: '2', name: 'Bill' };
     await dataStore.update(data);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'PUT',
       key: '2',
@@ -201,13 +194,13 @@ describe('Orion DataStore', () => {
           method: 'PATCH',
         },
       },
-      transporter: transporter,
+      transporter,
     });
 
     const data = { id: '3', name: 'Bill' };
     await dataStore.update(data);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'PATCH',
       key: '3',
@@ -221,12 +214,12 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     await dataStore.remove('2');
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'DELETE',
       key: '2',
@@ -234,7 +227,7 @@ describe('Orion DataStore', () => {
 
     await dataStore.remove('3', true);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'DELETE',
       key: '3',
@@ -248,7 +241,7 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
       routes: {
         remove: {
           path: 'remove',
@@ -259,7 +252,7 @@ describe('Orion DataStore', () => {
 
     await dataStore.remove('3');
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'OPTIONS',
       key: '3',
@@ -271,12 +264,12 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     await dataStore.restore('4');
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'POST',
       key: '4',
@@ -288,7 +281,7 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
       routes: {
         restore: {
           path: 'custom-restore',
@@ -299,7 +292,7 @@ describe('Orion DataStore', () => {
 
     await dataStore.restore('5');
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'PUT',
       key: '5',
@@ -311,13 +304,13 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     const data = { name: '' };
     await dataStore.validate(data);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'POST',
       data: data,
@@ -341,7 +334,7 @@ describe('Orion DataStore', () => {
     const data = { name: '' };
     await dataStore.validate(data);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://localhost/contacts',
       method: 'PUT',
       data: data,
@@ -350,17 +343,17 @@ describe('Orion DataStore', () => {
   });
 
   it('POST /search - exists', async () => {
-    executeMock.mockReturnValue([]);
+    const transporter = jest.fn().mockReturnValue(Promise.resolve({ data: [] }));
 
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://localhost/contacts',
-      transporter: transporter,
+      transporter,
     });
 
     await dataStore.exists({ name: 'Bill' });
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       data: {
         filters: [{ field: 'name', operator: '=', value: 'Bill' }],
         scopes: [],
@@ -376,7 +369,7 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://testing.com/contacts/{contact}/media',
-      transporter: transporter,
+      transporter,
     });
 
     const type = 'image/png';
@@ -392,7 +385,7 @@ describe('Orion DataStore', () => {
 
     await dataStore.upload(params);
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://testing.com/contacts/1/media',
       method: 'POST',
       blob: true,
@@ -407,14 +400,14 @@ describe('Orion DataStore', () => {
     const dataStore = new OrionDataStore({
       key: 'id',
       baseUrl: 'http://testing.com/contacts/{contact}/media',
-      transporter: transporter,
+      transporter,
     });
 
     dataStore.link({ contact: 1 });
 
     await dataStore.download('2');
 
-    expect(transporter.execute).toHaveBeenCalledWith({
+    expect(transporter).toHaveBeenCalledWith({
       baseUrl: 'http://testing.com/contacts/1/media',
       method: 'GET',
       path: '2',
