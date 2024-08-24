@@ -1,4 +1,5 @@
 export * from './DataStore';
-export * from './RxDBDataStore';
 export * from './OrionDataStore';
+export * from './RestDataStore';
+export * from './RxDBDataStore';
 export * from './Transporter';
