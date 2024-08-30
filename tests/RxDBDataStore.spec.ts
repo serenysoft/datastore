@@ -2,7 +2,7 @@ import { RxDatabase } from 'rxdb';
 import { initDatabase } from './database';
 import { RxDBDataStore } from '../src';
 
-describe('Offline DataStore', () => {
+describe('RxDB DataStore', () => {
   let database: RxDatabase;
   let dataStore: RxDBDataStore;
 
@@ -15,40 +15,6 @@ describe('Offline DataStore', () => {
 
   afterEach(async () => {
     await database.remove();
-  });
-
-  it('Should find record by query', async () => {
-    const categoryDataStore = new RxDBDataStore({
-      key: 'name',
-      collection: database.collections.categories,
-    });
-
-    await categoryDataStore.insert({ id: '1', name: 'Science' });
-
-    let result = await categoryDataStore.findOne({
-      filter: { id: '1', name: 'Science' },
-    });
-    expect(result).toBeTruthy();
-
-    result = await categoryDataStore.findOne({
-      filter: { id: '1', name: 'Technology' },
-    });
-    expect(result).toBe(null);
-  });
-
-  it('Should find record by alternative key', async () => {
-    const categoryDataStore = new RxDBDataStore({
-      key: 'name',
-      collection: database.collections.categories,
-    });
-
-    await categoryDataStore.insert({ id: '1', name: 'Technology' });
-
-    let result = await categoryDataStore.findOne('Technology');
-    expect(result).toBeTruthy();
-
-    result = await categoryDataStore.findOne('1');
-    expect(result).toBe(null);
   });
 
   it('Should check document exists', async () => {
@@ -94,11 +60,8 @@ describe('Offline DataStore', () => {
 
     await dataStore.insert({ id: '1', name: 'Bill', profileId: 2 });
 
-    let result = await dataStore.findAll();
+    const result = await dataStore.findAll();
     expect(result.length).toBe(0);
-
-    result = await dataStore.findOne({ filter: { id: '1' } });
-    expect(result).toBeNull();
   });
 
   it('Should includes link params to filter options', async () => {
@@ -112,12 +75,6 @@ describe('Offline DataStore', () => {
 
     results = await dataStore.findAll({ filter: { name: 'Jeff' } });
     expect(results.length).toBe(0);
-
-    let result = await dataStore.findOne('2'); // should ignore link
-    expect(result.name).toEqual('Jeff');
-
-    result = await dataStore.findOne({ filter: { name: 'Bill' } });
-    expect(result).not.toBeNull();
   });
 
   it('Should populate ref properties', async () => {

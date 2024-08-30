@@ -22,24 +22,8 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
     return this.options.key || this.collection().schema.primaryPath;
   }
 
-  async findOne(key: string | FindOptions): Promise<T> {
-    let query;
-
-    if (typeof key === 'string') {
-      const { primaryPath } = this.collection().schema;
-      query = this.key() !== primaryPath ? { selector: { [this.key()]: key } } : key;
-    } else {
-      if (!this.validateLinkParams()) {
-        return null;
-      }
-
-      key.filter = merge(key.filter, this.linkParams);
-
-      const transformer = new RxDBFindTransformer(this.options.search);
-      query = transformer.execute(key);
-    }
-
-    const document = await this.collection().findOne(query).exec();
+  async findOne(key: string): Promise<T> {
+    const document = await this.collection().findOne(key).exec();
     return document && !document.deleted ? this.populate(document) : null;
   }
 
