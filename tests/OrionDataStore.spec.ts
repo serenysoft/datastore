@@ -351,7 +351,7 @@ describe('Orion DataStore', () => {
       transporter,
     });
 
-    await dataStore.exists({ name: 'Bill' });
+    await dataStore.exists(['name', '=', 'Bill']);
 
     expect(transporter).toHaveBeenCalledWith({
       data: {

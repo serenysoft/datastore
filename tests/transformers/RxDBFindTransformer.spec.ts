@@ -29,25 +29,26 @@ describe('Offline - FindTransformer', () => {
     const result = trasformer.execute({
       limit: 5,
       skip: 10,
-      searchValue: 10,
+      search: 10,
       group: [{ selector: 'category' }],
       sort: [
         { selector: 'age', desc: true },
         { selector: 'name', desc: false },
       ],
-      filter: {
-        active: true,
-        scope: undefined,
-      },
+      filter: [
+        ['active', '=', true],
+        ['scope', '=', undefined],
+      ],
     });
-
-    const regex = { $regex: new RegExp('.*10.*', 'i') };
 
     expect(result).toEqual({
       limit: 5,
       skip: 10,
       selector: {
-        $and: [{ $or: [{ name: regex }, { age: 10 }] }, { active: true }],
+        $and: [
+          { active: true },
+          { $or: [{ name: { $regex: new RegExp('.*10.*', 'i') } }, { age: 10 }] },
+        ],
       },
       sort: [{ category: 'asc' }, { age: 'desc' }, { name: 'asc' }],
     });

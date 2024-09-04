@@ -73,7 +73,7 @@ describe('RxDB DataStore', () => {
     let results = await dataStore.findAll();
     expect(results.length).toBe(1);
 
-    results = await dataStore.findAll({ filter: { name: 'Jeff' } });
+    results = await dataStore.findAll({ filter: ['name', '=', 'Jeff'] });
     expect(results.length).toBe(0);
   });
 

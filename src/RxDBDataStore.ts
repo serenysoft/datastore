@@ -1,5 +1,5 @@
 import { RxCollection, RxDocument } from 'rxdb';
-import { isNil, merge, pick } from 'lodash';
+import { flatMap, isNil, merge, pick } from 'lodash';
 import { RxDBFindTransformer } from './transformers/RxDBFindTransformer';
 import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
 
@@ -32,10 +32,12 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
       return [];
     }
 
-    options = merge(options, { filter: this.linkParams });
+    const filter = options?.filter || [];
+    const link = flatMap(Object.entries(this.linkParams), ([key, value]) => [key, '=', value]);
+    const opts = merge(options, { filter: [filter, link] });
 
     const transformer = new RxDBFindTransformer(this.options.search);
-    const queryOptions = transformer.execute(options);
+    const queryOptions = transformer.execute(opts);
     const query = this.collection().find(queryOptions);
     const results = await query.exec();
 

@@ -58,8 +58,6 @@ describe('Transporter', () => {
       transporter,
     );
 
-    console.log('data', response.data);
-
     expect(response).not.toHaveProperty('data');
     expect(response).toHaveProperty('name');
   });

@@ -99,9 +99,9 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     return result;
   }
 
-  async exists(condition: any): Promise<boolean> {
+  async exists(condition: any[]): Promise<boolean> {
     const result = await this.findAll({
-      filter: { filters: condition },
+      filter: condition,
     });
     return !!result.length;
   }

@@ -1,7 +1,11 @@
 export type LinkParams = Record<string, string | number>;
+
 export type SearchSort = { [param: string]: 'asc' | 'desc' };
 export type SearchFieldType = 'number' | 'string' | 'datetime';
 export type SearchField = string | { [name: string]: SearchFieldType };
+
+export type FindScope = { [name: string]: (string | number)[] };
+
 export type MediaParams = Record<string, string | number | Blob> & {
   name: string;
   type: string;
@@ -22,8 +26,9 @@ export interface Group {
 }
 
 export interface FindOptions {
-  filter?: any;
-  searchValue?: string | number;
+  filter?: any[];
+  scopes?: FindScope;
+  search?: string | number;
   skip?: number;
   limit?: number;
   sort?: FindSort[];

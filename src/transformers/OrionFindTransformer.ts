@@ -1,4 +1,4 @@
-import { isEmpty, isNil, omit, omitBy } from 'lodash';
+import { isEmpty, isNil, omitBy, remove } from 'lodash';
 import { Transformer } from './Transformer';
 import { FindOptions } from '../DataStore';
 
@@ -12,6 +12,68 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     group: 'group',
   };
 
+  private operators = new Map<string, string>([
+    ['=', '='],
+    ['>', '>'],
+    ['>=', '>='],
+    ['<', '<'],
+    ['<=', '<='],
+    ['<>', '!='],
+    ['contains', 'like'],
+    ['notcontains', 'not like'],
+    ['startswith', 'like'],
+    ['endswith', 'like'],
+    ['in', 'in'],
+    ['not in', 'not in'],
+    ['custom', 'custom'],
+  ]);
+
+  private resolvers = new Map<string, (value: string | number) => any>([
+    ['=', (value) => value],
+    ['>', (value) => value],
+    ['>=', (value) => value],
+    ['<', (value) => value],
+    ['<=', (value) => value],
+    ['<>', (value) => value],
+    ['contains', (value) => `%${value}%`],
+    ['notcontains', (value) => `%${value}%`],
+    ['startswith', (value) => `${value}%`],
+    ['endswith', (value) => `%${value}`],
+    ['in', (value) => value],
+    ['not in', (value) => value],
+    ['custom', (value) => value],
+  ]);
+
+  buildCondition(item: any): any {
+    return {
+      field: item[0],
+      operator: this.operators.get(item[1]),
+      value: this.resolvers.get(item[1])(item[2]),
+    };
+  }
+
+  buildFilter(filter: any, asArray: boolean = true): any {
+    if (!filter || isEmpty(filter)) {
+      return null;
+    }
+
+    if (!Array.isArray(filter[0])) {
+      const result = this.buildCondition(filter);
+      return asArray ? [result] : result;
+    }
+
+    const condition = filter.find((item: any) => !Array.isArray(item)) || 'and';
+    const items = filter.filter((item: any) => Array.isArray(item));
+    const result = {
+      type: condition,
+      nested: items.map((item: any) =>
+        Array.isArray(item[0]) ? this.buildFilter(item, false) : this.buildCondition(item),
+      ),
+    };
+
+    return asArray ? [result] : result;
+  }
+
   execute(data: FindOptions): any {
     const result = { method: 'POST', action: 'search' };
 
@@ -22,40 +84,33 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     const paginate = data.limit && !isNil(data.skip);
     const page = paginate ? Math.ceil(data.skip / data.limit) : 0;
 
-    const scopes = data.filter?.scopes || {};
-    const filters = data.filter?.filters || {};
-    const trashed = filters._trashed;
+    const [withTrashed] = remove(data.filter, (filter) => filter[0] === 'with_trashed');
+    const [onlyTrashed] = remove(data.filter, (filter) => filter[0] === 'only_trashed');
 
     const params: any = {
       [this.paramNames.limit]: data.limit,
       [this.paramNames.page]: paginate ? page + 1 : null,
+      with_trashed: withTrashed ? withTrashed[2] === true : null,
+      only_trashed: onlyTrashed ? onlyTrashed[2] === true : null,
     };
-
-    if (trashed) {
-      params[trashed] = true;
-    }
 
     const sort = data.sort?.map((order: any) => ({
       field: order.selector,
       direction: order.desc ? 'desc' : 'asc',
     }));
 
-    const scopesResult = Object.entries(scopes).map(([key, value]) => ({
+    const scopes = Object.entries(data.scopes || {}).map(([key, value]) => ({
       name: key,
       parameters: Array.isArray(value) ? value : [value],
     }));
 
-    const filtersResult = Object.entries(omit(filters, '_trashed')).map(([key, value]) => ({
-      field: key,
-      operator: Array.isArray(value) ? 'in' : '=',
-      value: value,
-    }));
+    const filters = this.buildFilter(data.filter);
 
     const body = {
-      search: data.searchValue ? { value: data.searchValue } : null,
-      sort: sort,
-      scopes: scopesResult,
-      filters: filtersResult,
+      sort,
+      scopes,
+      filters,
+      search: data.search ? { value: data.search } : null,
       [this.paramNames.group]: data.group?.map((group) => group.selector),
     };
 
