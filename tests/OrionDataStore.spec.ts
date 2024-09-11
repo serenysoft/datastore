@@ -414,4 +414,23 @@ describe('Orion DataStore', () => {
       blob: true,
     });
   });
+
+  it('Should return an empty array when invalid link is detected', async () => {
+    const dataStore = new OrionDataStore({
+      key: 'id',
+      baseUrl: 'http://testing.com/contacts/{contact}/media',
+      transporter,
+    });
+
+    dataStore.link({ contact: null });
+
+    let results = await dataStore.findAll();
+
+    expect(results.length).toBe(0);
+
+    dataStore.link({});
+
+    results = await dataStore.findAll();
+    expect(results.length).toBe(0);
+  });
 });

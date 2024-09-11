@@ -45,10 +45,16 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
   ]);
 
   buildCondition(item: any): any {
+    const key = item[1];
+
+    if (!this.operators.has(key)) {
+      throw new Error(`The operator "${key}" is invalid`);
+    }
+
     return {
       field: item[0],
-      operator: this.operators.get(item[1]),
-      value: this.resolvers.get(item[1])(item[2]),
+      operator: this.operators.get(key),
+      value: this.resolvers.get(key)(item[2]),
     };
   }
 
