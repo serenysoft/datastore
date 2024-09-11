@@ -27,6 +27,7 @@ describe('Orion - FindTransformer', () => {
         ['tag_id', 'in', [1, 2]],
         ['created_at', '>=', '2024-09-01'],
         ['created_at', '<=', '2024-09-03'],
+        ['age', '<>', undefined],
         ['with_trashed', '=', true],
         'and',
         [['id', '=', 1], 'or', ['name', '=', 'Bill']],

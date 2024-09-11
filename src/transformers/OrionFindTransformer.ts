@@ -1,4 +1,4 @@
-import { isEmpty, isNil, omitBy, remove } from 'lodash';
+import { compact, isEmpty, isNil, omitBy, remove } from 'lodash';
 import { Transformer } from './Transformer';
 import { FindOptions } from '../DataStore';
 
@@ -46,6 +46,11 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
 
   buildCondition(item: any): any {
     const key = item[1];
+    const value = item[2];
+
+    if (value === undefined) {
+      return;
+    }
 
     if (!this.operators.has(key)) {
       throw new Error(`The operator "${key}" is invalid`);
@@ -54,7 +59,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     return {
       field: item[0],
       operator: this.operators.get(key),
-      value: this.resolvers.get(key)(item[2]),
+      value: this.resolvers.get(key)(value),
     };
   }
 
@@ -72,8 +77,10 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     const items = filter.filter((item: any) => Array.isArray(item));
     const result = {
       type: condition,
-      nested: items.map((item: any) =>
-        Array.isArray(item[0]) ? this.buildFilter(item, false) : this.buildCondition(item),
+      nested: compact(
+        items.map((item: any) =>
+          Array.isArray(item[0]) ? this.buildFilter(item, false) : this.buildCondition(item),
+        ),
       ),
     };
 
