@@ -433,4 +433,32 @@ describe('Orion DataStore', () => {
     results = await dataStore.findAll();
     expect(results.length).toBe(0);
   });
+
+  it('Should modify data before execute request', async () => {
+    const dataStore = new OrionDataStore({
+      key: 'id',
+      baseUrl: 'http://testing.com/contacts',
+      transporter,
+      modifier: (value) => {
+        if (value instanceof Date) {
+          return `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
+        }
+      },
+    });
+
+    dataStore.insert({
+      name: 'Joe',
+      birthDate: new Date(2018, 10, 20),
+    });
+
+    expect(transporter).toHaveBeenCalledWith({
+      baseUrl: 'http://testing.com/contacts',
+      method: 'POST',
+      wrap: 'data',
+      data: {
+        name: 'Joe',
+        birthDate: '2018-10-20',
+      },
+    });
+  });
 });

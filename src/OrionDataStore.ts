@@ -15,9 +15,10 @@ export class OrionDataStore<T = any> extends RestDataStore<OrionDataStoreOptions
     headers,
     routes,
     paramNames,
-    transporter,
     wrap = 'data',
     attachable,
+    transporter,
+    modifier,
   }: OrionDataStoreOptions) {
     super({
       search,
@@ -26,9 +27,10 @@ export class OrionDataStore<T = any> extends RestDataStore<OrionDataStoreOptions
       headers,
       routes,
       paramNames,
-      transporter,
       wrap,
       attachable,
+      transporter,
+      modifier,
     });
   }
 

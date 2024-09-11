@@ -1,9 +1,10 @@
-import { isEmpty, isNil, isPlainObject, merge, omitBy } from 'lodash';
+import { isEmpty, isNil, isObjectLike, isPlainObject, isUndefined, merge, omitBy } from 'lodash';
 import { DataStore, DataStoreOptions, LinkParams, MediaParams } from './DataStore';
 import { FindOptions } from './DataStore';
 import { Transformer } from './transformers/Transformer';
-import { serializeDates } from './utils';
 import { executeRequest, Request, Transporter } from './Transporter';
+
+export type ModifierCallback = (value: any, key: string) => any;
 
 export interface RestRequest extends Request {
   baseUrl?: string;
@@ -36,6 +37,7 @@ export interface RestDataStoreOptions extends DataStoreOptions {
   routes?: RestRoutes;
   paramNames?: RestParamNames;
   wrap?: string;
+  modifier?: ModifierCallback;
   transporter: Transporter;
 }
 
@@ -202,7 +204,7 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     }
 
     if (isPlainObject(request.data)) {
-      request.data = serializeDates(request.data);
+      request.data = this.modify(request.data);
     }
 
     return await executeRequest(request, this.options.transporter);
@@ -237,6 +239,31 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     return (
       keys.length !== values.length || (!keys.length && urls.some((url) => this.macro.test(url)))
     );
+  }
+
+  private modify(data: object): any {
+    if (!this.options.modifier) {
+      return data;
+    }
+
+    const result: any = {};
+
+    for (const [key, value] of Object.entries(data)) {
+      if (isUndefined(value)) {
+        continue;
+      }
+
+      if (Array.isArray(value)) {
+        result[key] = value.map((element: any) =>
+          isObjectLike(element) ? this.modify(element) : element,
+        );
+      } else {
+        const newValue = this.options.modifier(value, key);
+        result[key] = isUndefined(newValue) ? value : newValue;
+      }
+    }
+
+    return result;
   }
 
   protected abstract createTransformer(): Transformer<FindOptions>;
