@@ -1,4 +1,4 @@
-import { compact, isEmpty, isNil, omitBy, remove } from 'lodash';
+import { compact, isEmpty, isNil, isUndefined, omitBy, remove } from 'lodash';
 import { Transformer } from './Transformer';
 import { FindOptions } from '../DataStore';
 
@@ -84,7 +84,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
       ),
     };
 
-    return asArray ? [result] : result;
+    return asArray && !isNil(result) ? [result] : result;
   }
 
   execute(data: FindOptions): any {
@@ -130,7 +130,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     return {
       ...result,
       params: omitBy(params, isNil),
-      data: omitBy(body, isNil),
+      data: omitBy(body, isUndefined),
     };
   }
 }
