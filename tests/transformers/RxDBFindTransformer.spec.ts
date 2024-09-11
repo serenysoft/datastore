@@ -1,7 +1,7 @@
 import { flatMap } from 'lodash';
 import { RxDBFindTransformer } from '../../src/transformers/RxDBFindTransformer';
 
-describe('Offline - FindTransformer', () => {
+describe('RxDB - FindTransformer', () => {
   it('Should transform find options by nullish values', async () => {
     const trasformer = new RxDBFindTransformer({
       fields: ['name', { age: 'number' }],

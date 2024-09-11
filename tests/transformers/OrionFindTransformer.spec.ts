@@ -67,4 +67,12 @@ describe('Orion - FindTransformer', () => {
       ],
     });
   });
+
+  it('Should throw invalid operator error', async () => {
+    const trasformer = new OrionFindTransformer();
+
+    expect(() => {
+      trasformer.execute({ filter: [['name', '!=', 'joe']] });
+    }).toThrow('The operator "!=" is invalid');
+  });
 });

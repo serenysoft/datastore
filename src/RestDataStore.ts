@@ -221,6 +221,7 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
 
   protected hasInvalidLink(): boolean {
     const { baseUrl, routes } = this.options;
+    const params = this.linkParams || {};
 
     const urls = [
       baseUrl,
@@ -230,7 +231,12 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
       routes?.show?.path,
     ].filter((url) => typeof url === 'string');
 
-    return isEmpty(this.linkParams) && urls.some((url) => this.macro.test(url));
+    const keys = Object.keys(params);
+    const values = Object.values(params).filter((value) => !isNil(value));
+
+    return (
+      keys.length !== values.length || (!keys.length && urls.some((url) => this.macro.test(url)))
+    );
   }
 
   protected abstract createTransformer(): Transformer<FindOptions>;
