@@ -1,10 +1,10 @@
-import { isEmpty, isNil, isObjectLike, isPlainObject, isUndefined, merge, omitBy } from 'lodash';
+import { isEmpty, isNil, isPlainObject, merge, omitBy } from 'lodash';
 import { DataStore, DataStoreOptions, LinkParams, MediaParams } from './DataStore';
 import { FindOptions } from './DataStore';
 import { Transformer } from './transformers/Transformer';
 import { executeRequest, Request, Transporter } from './Transporter';
 
-export type ModifierCallback = (value: any, key: string) => any;
+export type ModifierCallback = (data: any) => any;
 
 export interface RestRequest extends Request {
   baseUrl?: string;
@@ -203,8 +203,8 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
       delete request.params;
     }
 
-    if (isPlainObject(request.data)) {
-      request.data = this.modify(request.data);
+    if (isPlainObject(request.data) && this.options.modifier) {
+      request.data = this.options.modifier(request.data);
     }
 
     return await executeRequest(request, this.options.transporter);
@@ -239,31 +239,6 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     return (
       keys.length !== values.length || (!keys.length && urls.some((url) => this.macro.test(url)))
     );
-  }
-
-  private modify(data: object): any {
-    if (!this.options.modifier) {
-      return data;
-    }
-
-    const result: any = {};
-
-    for (const [key, value] of Object.entries(data)) {
-      if (isUndefined(value)) {
-        continue;
-      }
-
-      if (Array.isArray(value)) {
-        result[key] = value.map((element: any) =>
-          isObjectLike(element) ? this.modify(element) : element,
-        );
-      } else {
-        const newValue = this.options.modifier(value, key);
-        result[key] = isUndefined(newValue) ? value : newValue;
-      }
-    }
-
-    return result;
   }
 
   protected abstract createTransformer(): Transformer<FindOptions>;

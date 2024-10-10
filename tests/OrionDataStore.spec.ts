@@ -439,16 +439,15 @@ describe('Orion DataStore', () => {
       key: 'id',
       baseUrl: 'http://testing.com/contacts',
       transporter,
-      modifier: (value) => {
-        if (value instanceof Date) {
-          return `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
-        }
-      },
+      modifier: (data) => ({
+        ...data,
+        completeName: `${data.name} ${data.lastName}`,
+      }),
     });
 
     dataStore.insert({
       name: 'Joe',
-      birthDate: new Date(2018, 10, 20),
+      lastName: 'Louis',
     });
 
     expect(transporter).toHaveBeenCalledWith({
@@ -457,7 +456,8 @@ describe('Orion DataStore', () => {
       wrap: 'data',
       data: {
         name: 'Joe',
-        birthDate: '2018-10-20',
+        lastName: 'Louis',
+        completeName: 'Joe Louis',
       },
     });
   });
