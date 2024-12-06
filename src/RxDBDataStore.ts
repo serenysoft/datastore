@@ -1,7 +1,14 @@
 import { RxCollection, RxDocument } from 'rxdb';
 import { flatMap, isNil, merge, pick } from 'lodash';
 import { RxDBFindTransformer } from './transformers/RxDBFindTransformer';
-import { DataStore, DataStoreOptions, FindOptions, LinkParams, MediaParams } from './DataStore';
+import {
+  DataStore,
+  DataStoreOptions,
+  FindOptions,
+  FindResult,
+  LinkParams,
+  MediaParams,
+} from './DataStore';
 
 export interface RxDBDataStoreOptions<T = any> extends DataStoreOptions {
   collection: RxCollection<T>;
@@ -27,9 +34,9 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
     return document && !document.deleted ? this.populate(document) : null;
   }
 
-  async findAll(options?: FindOptions): Promise<T[]> {
+  async findAll(options?: FindOptions): Promise<FindResult<T>> {
     if (!this.validateLinkParams()) {
-      return [];
+      return { data: [] };
     }
 
     const filter = options?.filter || [];
@@ -38,10 +45,12 @@ export class RxDBDataStore<T = any> implements DataStore<T> {
 
     const transformer = new RxDBFindTransformer(this.options.search);
     const queryOptions = transformer.execute(opts);
-    const query = this.collection().find(queryOptions);
-    const results = await query.exec();
+    const queryFind = this.collection().find(queryOptions);
+    const results = await queryFind.exec();
 
-    return Promise.all(results.map((result) => this.populate(result)));
+    return {
+      data: await Promise.all(results.map((result) => this.populate(result))),
+    };
   }
 
   async exists(condition: any): Promise<boolean> {

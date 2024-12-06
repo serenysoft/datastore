@@ -74,6 +74,10 @@ export class OrionDataStore<T = any> extends RestDataStore<OrionDataStoreOptions
     return result;
   }
 
+  protected parseTotalCount(response: any): number {
+    return response.meta?.total || 0;
+  }
+
   protected createTransformer(): Transformer<FindOptions> {
     return new OrionFindTransformer();
   }

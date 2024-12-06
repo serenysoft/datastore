@@ -61,7 +61,7 @@ describe('RxDB DataStore', () => {
     await dataStore.insert({ id: '1', name: 'Bill', profileId: 2 });
 
     const result = await dataStore.findAll();
-    expect(result.length).toBe(0);
+    expect(result.data.length).toBe(0);
   });
 
   it('Should includes link params to filter options', async () => {
@@ -70,11 +70,11 @@ describe('RxDB DataStore', () => {
 
     dataStore.link({ profileId: 1 });
 
-    let results = await dataStore.findAll();
-    expect(results.length).toBe(1);
+    let result = await dataStore.findAll();
+    expect(result.data.length).toBe(1);
 
-    results = await dataStore.findAll({ filter: ['name', '=', 'Jeff'] });
-    expect(results.length).toBe(0);
+    result = await dataStore.findAll({ filter: ['name', '=', 'Jeff'] });
+    expect(result.data.length).toBe(0);
   });
 
   it('Should populate ref properties', async () => {

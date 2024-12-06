@@ -424,14 +424,14 @@ describe('Orion DataStore', () => {
 
     dataStore.link({ contact: null });
 
-    let results = await dataStore.findAll();
+    let result = await dataStore.findAll();
 
-    expect(results.length).toBe(0);
+    expect(result.data.length).toBe(0);
 
     dataStore.link({});
 
-    results = await dataStore.findAll();
-    expect(results.length).toBe(0);
+    result = await dataStore.findAll();
+    expect(result.data.length).toBe(0);
   });
 
   it('Should modify data before execute request', async () => {
@@ -460,5 +460,23 @@ describe('Orion DataStore', () => {
         completeName: 'Joe Louis',
       },
     });
+  });
+
+  it('Should parse total count from response', async () => {
+    const transporter = jest.fn().mockReturnValue(
+      Promise.resolve({
+        data: [{ id: 1, name: 'Jeff' }],
+        meta: { total: 1 },
+      }),
+    );
+
+    const dataStore = new OrionDataStore({
+      baseUrl: 'http://api.fake.test',
+      transporter,
+    });
+
+    const result = await dataStore.findAll();
+
+    expect(result.totalCount).toBe(1);
   });
 });

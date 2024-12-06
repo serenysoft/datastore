@@ -25,7 +25,5 @@ export async function executeRequest(request: Request, transporter: Transporter)
   const data = omitBy(request.data, isNil);
   const params = omitBy({ ...request, data }, (value) => !isBoolean(value) && isEmpty(value));
 
-  const response = await transporter(params);
-
-  return request.wrap ? response[request.wrap] : response;
+  return await transporter(params);
 }

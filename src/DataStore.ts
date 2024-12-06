@@ -5,6 +5,7 @@ export type SearchFieldType = 'number' | 'string' | 'datetime';
 export type SearchField = string | { [name: string]: SearchFieldType };
 
 export type FindScope = { [name: string]: (string | number)[] };
+export type FindResult<T> = { data: T[]; totalCount?: number };
 
 export type MediaParams = Record<string, string | number | Blob> & {
   name: string;
@@ -45,7 +46,7 @@ export interface DataStore<T = any> {
 
   findOne(key: string): Promise<T>;
 
-  findAll(options?: FindOptions): Promise<T[]>;
+  findAll(options?: FindOptions): Promise<FindResult<T>>;
 
   exists(options: any): Promise<boolean>;
 

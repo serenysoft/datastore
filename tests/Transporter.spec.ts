@@ -47,21 +47,6 @@ describe('Transporter', () => {
     expect(Array.isArray(response)).toBe(true);
   });
 
-  it('should execute request with wrap', async () => {
-    const response = await executeRequest(
-      {
-        path: '/contacts/wrap',
-        method: 'POST',
-        wrap: 'data',
-        data: { name: 'Jeff' },
-      },
-      transporter,
-    );
-
-    expect(response).not.toHaveProperty('data');
-    expect(response).toHaveProperty('name');
-  });
-
   it('should omit nil values from request data', async () => {
     const data: any = {
       id: 'abcdef',

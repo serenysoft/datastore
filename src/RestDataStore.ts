@@ -1,5 +1,5 @@
 import { isEmpty, isNil, isPlainObject, merge, omitBy } from 'lodash';
-import { DataStore, DataStoreOptions, LinkParams, MediaParams } from './DataStore';
+import { DataStore, DataStoreOptions, FindResult, LinkParams, MediaParams } from './DataStore';
 import { FindOptions } from './DataStore';
 import { Transformer } from './transformers/Transformer';
 import { executeRequest, Request, Transporter } from './Transporter';
@@ -80,9 +80,9 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     return result;
   }
 
-  async findAll(options?: FindOptions): Promise<T[]> {
+  async findAll(options?: FindOptions): Promise<FindResult<T>> {
     if (this.hasInvalidLink()) {
-      return [];
+      return { data: [], totalCount: 0 };
     }
 
     const transformer = this.createTransformer();
@@ -96,16 +96,14 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
       this.options.routes?.index,
     );
 
-    const result = await this.execute(request);
-
-    return result;
+    return await this.execute(request, true);
   }
 
   async exists(condition: any[]): Promise<boolean> {
     const result = await this.findAll({
       filter: condition,
     });
-    return !!result.length;
+    return !!result.data.length;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -190,7 +188,7 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
     return result;
   }
 
-  async execute(route: Request) {
+  async execute(route: Request, totalCount?: boolean): Promise<any> {
     const request = {
       baseUrl: this.formatMacro(this.options.baseUrl),
       ...route,
@@ -207,7 +205,16 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
       request.data = this.options.modifier(request.data);
     }
 
-    return await executeRequest(request, this.options.transporter);
+    const response = await executeRequest(request, this.options.transporter);
+
+    const result = request.wrap ? response[request.wrap] : response;
+
+    return totalCount
+      ? {
+          data: result,
+          totalCount: this.parseTotalCount(response),
+        }
+      : result;
   }
 
   protected formatMacro(text: string): string {
@@ -219,6 +226,11 @@ export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
       const value = this.linkParams[key] as string;
       return value || '';
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected parseTotalCount(response: any): number {
+    return null;
   }
 
   protected hasInvalidLink(): boolean {
