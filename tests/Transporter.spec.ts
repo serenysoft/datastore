@@ -52,6 +52,7 @@ describe('Transporter', () => {
       id: 'abcdef',
       name: 'jeff',
       last_name: null,
+      age: undefined,
     };
 
     const request = jest.spyOn(http, 'request').mockReturnValue(Promise.resolve({}));
@@ -69,11 +70,10 @@ describe('Transporter', () => {
       data: {
         id: 'abcdef',
         name: 'jeff',
+        last_name: null,
       },
       method: 'POST',
       url: 'users',
-      headers: undefined,
-      params: undefined,
     });
   });
 });
