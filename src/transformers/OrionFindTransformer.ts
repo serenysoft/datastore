@@ -1,4 +1,4 @@
-import { compact, isEmpty, isNil, isUndefined, omitBy, remove } from 'lodash';
+import { isEmpty, isNil, isUndefined, omitBy, remove } from 'lodash';
 import { Transformer } from './Transformer';
 import { FindOptions } from '../DataStore';
 
@@ -63,28 +63,36 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     };
   }
 
-  buildFilter(filter: any, asArray: boolean = true): any {
-    if (!filter || isEmpty(filter)) {
+  buildFilter(filters: any): any {
+    if (!filters || isEmpty(filters)) {
       return null;
     }
 
-    if (!Array.isArray(filter[0])) {
-      const result = this.buildCondition(filter);
-      return asArray ? [result] : result;
+    if (this.operators.has(filters[1])) {
+      filters = [filters];
     }
 
-    const condition = filter.find((item: any) => !Array.isArray(item)) || 'and';
-    const items = filter.filter((item: any) => Array.isArray(item));
-    const result = {
-      type: condition,
-      nested: compact(
-        items.map((item: any) =>
-          Array.isArray(item[0]) ? this.buildFilter(item, false) : this.buildCondition(item),
-        ),
-      ),
-    };
+    let type;
+    const result = [];
 
-    return asArray && !isNil(result) ? [result] : result;
+    for (const expression of filters) {
+      if (['or', 'and'].includes(expression)) {
+        type = expression;
+      } else {
+        const isArray = Array.isArray(expression[0]);
+        const condition = isArray ? this.buildFilter(expression) : this.buildCondition(expression);
+
+        if (isArray) {
+          result.push({ type, nested: condition });
+        } else if (condition) {
+          result.push(type ? { type, ...condition } : condition);
+        }
+
+        type = null;
+      }
+    }
+
+    return result;
   }
 
   execute(data: FindOptions): any {

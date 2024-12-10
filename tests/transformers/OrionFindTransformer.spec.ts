@@ -29,8 +29,8 @@ describe('Orion - FindTransformer', () => {
         ['created_at', '<=', '2024-09-03'],
         ['age', '<>', undefined],
         ['with_trashed', '=', true],
-        'and',
-        [['id', '=', 1], 'or', ['name', '=', 'Bill']],
+        'or',
+        [['id', '=', 1], 'and', ['name', '=', 'Bill']],
       ],
       scopes: {
         whereCategory: [1],
@@ -42,20 +42,15 @@ describe('Orion - FindTransformer', () => {
     expect(result.params).toEqual({ limit: 5, page: 3, with_trashed: true });
     expect(result.data).toEqual({
       filters: [
+        { field: 'active', operator: '=', value: true },
+        { field: 'tag_id', operator: 'in', value: [1, 2] },
+        { field: 'created_at', operator: '>=', value: '2024-09-01' },
+        { field: 'created_at', operator: '<=', value: '2024-09-03' },
         {
-          type: 'and',
+          type: 'or',
           nested: [
-            { field: 'active', operator: '=', value: true },
-            { field: 'tag_id', operator: 'in', value: [1, 2] },
-            { field: 'created_at', operator: '>=', value: '2024-09-01' },
-            { field: 'created_at', operator: '<=', value: '2024-09-03' },
-            {
-              type: 'or',
-              nested: [
-                { field: 'id', operator: '=', value: 1 },
-                { field: 'name', operator: '=', value: 'Bill' },
-              ],
-            },
+            { field: 'id', operator: '=', value: 1 },
+            { type: 'and', field: 'name', operator: '=', value: 'Bill' },
           ],
         },
       ],
