@@ -1,4 +1,4 @@
-import { isBoolean, isEmpty, isNil, omitBy } from 'lodash';
+import { isBoolean, isEmpty, isUndefined, omitBy } from 'lodash';
 
 export type RequestHeaders = Record<string, string | number | boolean>;
 export type RequestParams = Record<string, string | number | object | boolean>;
@@ -22,7 +22,7 @@ export interface Request extends Route {
 }
 
 export async function executeRequest(request: Request, transporter: Transporter): Promise<any> {
-  const data = omitBy(request.data, isNil);
+  const data = omitBy(request.data, isUndefined);
   const params = omitBy({ ...request, data }, (value) => !isBoolean(value) && isEmpty(value));
 
   return await transporter(params);
