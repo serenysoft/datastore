@@ -35,6 +35,7 @@ export interface FindOptions {
   sort?: FindSort[];
   sync?: boolean;
   group?: Group[];
+  params?: Record<string, any>;
 }
 
 export interface DataStoreOptions {

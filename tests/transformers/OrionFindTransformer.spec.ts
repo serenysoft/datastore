@@ -35,11 +35,14 @@ describe('Orion - FindTransformer', () => {
       scopes: {
         whereCategory: [1],
       },
+      params: {
+        pagination: 0,
+      },
     });
 
     expect(result.method).toEqual('POST');
     expect(result.action).toEqual('search');
-    expect(result.params).toEqual({ limit: 5, page: 3, with_trashed: true });
+    expect(result.params).toEqual({ limit: 5, page: 3, with_trashed: true, pagination: 0 });
     expect(result.data).toEqual({
       filters: [
         { field: 'active', operator: '=', value: true },

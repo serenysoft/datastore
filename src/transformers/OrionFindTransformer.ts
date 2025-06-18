@@ -1,4 +1,4 @@
-import { isEmpty, isNil, omitBy, remove } from 'lodash';
+import { isEmpty, isNil, List, omitBy, remove } from 'lodash';
 import { Transformer } from './Transformer';
 import { FindOptions } from '../DataStore';
 
@@ -104,11 +104,13 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
 
     const paginate = data.limit && !isNil(data.skip);
     const page = paginate ? Math.ceil(data.skip / data.limit) : 0;
+    const filter = (data.filter || []) as List<any>;
 
-    const [withTrashed] = remove(data.filter, (filter) => filter[0] === 'with_trashed');
-    const [onlyTrashed] = remove(data.filter, (filter) => filter[0] === 'only_trashed');
+    const [withTrashed] = remove(filter, (filter: any) => filter[0] === 'with_trashed');
+    const [onlyTrashed] = remove(filter, (filter: any) => filter[0] === 'only_trashed');
 
     const params: any = {
+      ...data.params,
       [this.paramNames.limit]: data.limit,
       [this.paramNames.page]: paginate ? page + 1 : null,
       with_trashed: withTrashed ? withTrashed[2] === true : null,
