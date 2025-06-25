@@ -45,7 +45,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
   ]);
 
   formatLike(value: string|number): string {
-    return `%${value.toString().replace(/\s+/, '%')}%`;
+    return `%${value.toString().replace(/\s+/g, '%')}%`;
   }
 
   buildCondition(item: any): any {

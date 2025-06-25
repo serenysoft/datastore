@@ -27,7 +27,7 @@ describe('Orion - FindTransformer', () => {
         ['tag_id', 'in', [1, 2]],
         ['created_at', '>=', '2024-09-01'],
         ['created_at', '<=', '2024-09-03'],
-        ['name', 'contains', 'Steve Jobs'],
+        ['name', 'contains', 'Steven Paul Jobs'],
         ['age', '<>', undefined],
         ['with_trashed', '=', true],
         'or',
@@ -50,7 +50,7 @@ describe('Orion - FindTransformer', () => {
         { field: 'tag_id', operator: 'in', value: [1, 2] },
         { field: 'created_at', operator: '>=', value: '2024-09-01' },
         { field: 'created_at', operator: '<=', value: '2024-09-03' },
-        { field: 'name', operator: 'like', value: '%Steve%Jobs%' },
+        { field: 'name', operator: 'like', value: '%Steven%Paul%Jobs%' },
         {
           type: 'or',
           nested: [
