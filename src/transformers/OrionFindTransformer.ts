@@ -35,14 +35,18 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     ['<', (value) => value],
     ['<=', (value) => value],
     ['<>', (value) => value],
-    ['contains', (value) => `%${value}%`],
-    ['notcontains', (value) => `%${value}%`],
-    ['startswith', (value) => `${value}%`],
-    ['endswith', (value) => `%${value}`],
+    ['contains', (value) => this.formatLike(value)],
+    ['notcontains', (value) => this.formatLike(value)],
+    ['startswith', (value) => this.formatLike(value)],
+    ['endswith', (value) => this.formatLike(value)],
     ['in', (value) => value],
     ['not in', (value) => value],
     ['custom', (value) => value],
   ]);
+
+  formatLike(value: string|number): string {
+    return `%${value.toString().replace(/\s+/, '%')}%`;
+  }
 
   buildCondition(item: any): any {
     const key = item[1];
