@@ -16,7 +16,7 @@ describe('Orion - FindTransformer', () => {
     result = trasformer.execute({
       limit: 5,
       skip: 10,
-      search: 'loren',
+      search: 'loren ipsum dolor',
       sort: [
         { selector: 'age', desc: true },
         { selector: 'name', desc: false },
@@ -60,7 +60,7 @@ describe('Orion - FindTransformer', () => {
         },
       ],
       scopes: [{ name: 'whereCategory', parameters: [1] }],
-      search: { value: 'loren' },
+      search: { value: '%loren%ipsum%dolor%' },
       group: ['city'],
       sort: [
         { field: 'age', direction: 'desc' },

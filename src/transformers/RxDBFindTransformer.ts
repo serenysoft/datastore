@@ -112,7 +112,7 @@ export class RxDBFindTransformer implements Transformer<FindOptions> {
       }
     }
 
-    return omitBy(result, (value) => isNil(value));
+    return omitBy(result, (value: any) => isNil(value));
   }
 
   private buildSearchCondition(search: string | number) {
@@ -123,7 +123,7 @@ export class RxDBFindTransformer implements Transformer<FindOptions> {
       return [name, operator, search];
     });
 
-    return flatMap(result, (item: any, index) => {
+    return flatMap(result, (item: any, index: number) => {
       return index === result.length - 1 ? [item] : [item, 'or'];
     });
   }

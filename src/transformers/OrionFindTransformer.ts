@@ -1,4 +1,4 @@
-import { isEmpty, isNil, List, omitBy, remove } from 'lodash';
+import { isEmpty, isNil, omitBy, remove } from 'lodash';
 import { Transformer } from './Transformer';
 import { FindOptions } from '../DataStore';
 
@@ -44,7 +44,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
     ['custom', (value) => value],
   ]);
 
-  formatLike(value: string|number): string {
+  formatLike(value: string | number): string {
     return `%${value.toString().replace(/\s+/g, '%')}%`;
   }
 
@@ -108,7 +108,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
 
     const paginate = data.limit && !isNil(data.skip);
     const page = paginate ? Math.ceil(data.skip / data.limit) : 0;
-    const filter = (data.filter || []) as List<any>;
+    const filter = (data.filter || []) as any[];
 
     const [withTrashed] = remove(filter, (filter: any) => filter[0] === 'with_trashed');
     const [onlyTrashed] = remove(filter, (filter: any) => filter[0] === 'only_trashed');
@@ -137,7 +137,7 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
       sort,
       scopes,
       filters,
-      search: data.search ? { value: data.search } : null,
+      search: data.search ? { value: this.formatLike(data.search) } : null,
       [this.paramNames.group]: data.group?.map((group) => group.selector),
     };
 
