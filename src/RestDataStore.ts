@@ -44,7 +44,7 @@ export interface RestDataStoreOptions extends DataStoreOptions {
 export abstract class RestDataStore<O extends RestDataStoreOptions, T = any>
   implements DataStore<T>
 {
-  private linkParams: LinkParams;
+  private linkParams: LinkParams = {};
   private readonly macro = /\{(\w+)\}/;
 
   constructor(protected options: O) {}
