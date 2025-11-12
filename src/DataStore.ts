@@ -7,6 +7,13 @@ export type SearchField = string | { [name: string]: SearchFieldType };
 export type FindScope = { [name: string]: (string | number)[] };
 export type FindResult<T> = { data: T[]; totalCount?: number };
 
+export type Aggregate = {
+  type: string;
+  selector: string;
+  field?: string;
+  filters?: any[];
+};
+
 export type MediaParams = Record<string, string | number | Blob> & {
   name: string;
   type: string;
@@ -29,6 +36,7 @@ export interface Group {
 export interface FindOptions {
   filter?: any[];
   scopes?: FindScope;
+  aggregates?: Aggregate[];
   search?: string | number;
   skip?: number;
   limit?: number;

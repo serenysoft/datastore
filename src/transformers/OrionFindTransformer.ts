@@ -121,6 +121,8 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
       only_trashed: onlyTrashed ? onlyTrashed[2] === true : null,
     };
 
+    const filters = this.buildFilter(data.filter);
+
     const sort = data.sort?.map((order: any) => ({
       field: order.selector,
       direction: order.desc ? 'desc' : 'asc',
@@ -131,12 +133,23 @@ export class OrionFindTransformer implements Transformer<FindOptions> {
       parameters: Array.isArray(value) ? value : [value],
     }));
 
-    const filters = this.buildFilter(data.filter);
+    const aggregates = data.aggregates?.map((item) =>
+      omitBy(
+        {
+          type: item.type,
+          relation: item.selector,
+          field: item.field,
+          filters: this.buildFilter(item.filters),
+        },
+        isNil,
+      ),
+    );
 
     const body = {
       sort,
       scopes,
       filters,
+      aggregates,
       search: data.search ? { value: this.formatLike(data.search) } : null,
       [this.paramNames.group]: data.group?.map((group) => group.selector),
     };

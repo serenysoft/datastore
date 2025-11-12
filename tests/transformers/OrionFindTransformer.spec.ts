@@ -36,6 +36,7 @@ describe('Orion - FindTransformer', () => {
       scopes: {
         whereCategory: [1],
       },
+      aggregates: [{ type: 'exists', selector: 'tags' }],
       params: {
         pagination: 0,
       },
@@ -59,6 +60,7 @@ describe('Orion - FindTransformer', () => {
           ],
         },
       ],
+      aggregates: [{ type: 'exists', relation: 'tags' }],
       scopes: [{ name: 'whereCategory', parameters: [1] }],
       search: { value: '%loren%ipsum%dolor%' },
       group: ['city'],
