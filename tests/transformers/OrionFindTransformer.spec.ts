@@ -51,7 +51,7 @@ describe('Orion - FindTransformer', () => {
         { field: 'tag_id', operator: 'in', value: [1, 2] },
         { field: 'created_at', operator: '>=', value: '2024-09-01' },
         { field: 'created_at', operator: '<=', value: '2024-09-03' },
-        { field: 'name', operator: 'like', value: '%Steven%Paul%Jobs%' },
+        { field: 'name', operator: 'like', value: 'Steven%Paul%Jobs' },
         {
           type: 'or',
           nested: [
@@ -62,7 +62,7 @@ describe('Orion - FindTransformer', () => {
       ],
       aggregates: [{ type: 'exists', relation: 'tags' }],
       scopes: [{ name: 'whereCategory', parameters: [1] }],
-      search: { value: '%loren%ipsum%dolor%' },
+      search: { value: 'loren%ipsum%dolor' },
       group: ['city'],
       sort: [
         { field: 'age', direction: 'desc' },
