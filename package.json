@@ -2,7 +2,7 @@
   "name": "@sereny/datastore",
   "description": "The DataStore provides an interface for loading, editing and handling related events.",
   "readmeFilename": "README.md",
-  "version": "0.23.2",
+  "version": "0.23.3",
   "license": "MIT",
   "keywords": [
     "datasource",
@@ -37,7 +37,7 @@
   },
   "peerDependencies": {
     "lodash": "^4.17.0",
-    "rxdb": "^15.0.0"
+    "rxdb": "^15.0.0||^16.0.0||^17.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.24.4",
@@ -68,7 +68,11 @@
   },
   "release-it": {
     "git": {
+      "requireCleanWorkingDir": false,
       "commitMessage": "Release v${version}"
+    },
+    "npm": {
+      "publish": false
     },
     "hooks": {
       "before:init": [
@@ -134,5 +138,10 @@
   },
   "dependencies": {
     "luxon": "^3.4.4"
+  },
+  "overrides": {
+    "release-it": {
+      "undici": "6.24.1"
+    }
   }
 }
